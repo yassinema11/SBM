@@ -42,6 +42,7 @@ dependencies:
   shared_preferences: ^2.2.0
   curved_navigation_bar: ^1.0.3
   flutter_blue: ^0.8.0
+  retrofit: ^4.0.3
 
 
 

@@ -2,11 +2,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:temp1/components/my_button.dart';
-import 'package:mongo_dart/mongo_dart.dart' as mongo;
-import 'package:shared_preferences/shared_preferences.dart';
-
-import 'package:crypto/crypto.dart';
 import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:crypto/crypto.dart';
+
 
 class RegisterPage extends StatefulWidget 
 {
@@ -43,41 +43,48 @@ class RegisterPageState extends State<RegisterPage>
 
 
 /* **************** R E G I S T E R  F U N C T I O N ******************* */
+
+
 void signUserUp() async 
 {
+        print('Data  ');
+
   String userEmail = emailController.text;
   String userPassword = passwordController.text;
   String userPhoneNumber = phoneController.text;
 
-  String emailCrypted = cryptageData(userEmail);
-  String phoneNumberCrypted = cryptageData(userPhoneNumber);
   String passwordCrypted = cryptageData(userPassword);
+
+  // URL of your backend server's API endpoint for user sign-up
+  var signUpUrl = Uri.parse('http://192.168.178.16:5000/signup');
 
   try 
   {
-    var db = await mongo.Db.create("mongodb+srv://sbm2024:sbm2024_projet@cluster0.pud7wkc.mongodb.net/");
-    await db.open();
-
-    var usersCollection = db.collection('users'); 
-
-    var existingUser = await usersCollection.findOne(mongo.where.eq('email', emailCrypted));
-
-    if (existingUser == null) 
-    {
-      await usersCollection.insert
+    var response = await http.post
+    (
+      signUpUrl,
+      headers: 
+      {
+        'Content-Type': 'application/json', 
+      },
+      body: jsonEncode
       (
         {
-        'email': emailCrypted,
+        'email': userEmail,
         'password': passwordCrypted,
-        'phone': phoneNumberCrypted,
+        'phone': userPhoneNumber,
         }
-      );
+      ),
+    );
 
+    if (response.statusCode == 200 || response.statusCode==201) 
+    {
+      print('Data success');
       Navigator.pushNamed
       (
         context,
         '/loginpage',
-        arguments:
+        arguments: 
         {
           'email': userEmail,
           'password': userPassword,
@@ -86,16 +93,14 @@ void signUserUp() async
     } 
     else 
     {
-      debugPrint('User with the same email already exists');
+      debugPrint('User sign-up failed with status: ${response.statusCode}');
     }
-    await db.close();
   } 
   catch (e) 
   {
-    debugPrint('Error connecting to the database: $e');
+    debugPrint('Error: $e');
   }
 }
-
 
     /* **************** L O G I N    F U N C T I O N ******************* */
 

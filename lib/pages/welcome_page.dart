@@ -1,10 +1,14 @@
-// ignore_for_file: avoid_unnecessary_containers, non_constant_identifier_names, prefer_const_constructors, prefer_const_literals_to_create_immutables, avoid_print, sized_box_for_whitespace, unused_element, use_build_context_synchronously
+// ignore_for_file: avoid_unnecessary_containers, non_constant_identifier_names, prefer_const_constructors, prefer_const_literals_to_create_immutables, avoid_print, sized_box_for_whitespace, unused_element, use_build_context_synchronously, unused_local_variable
 
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
-class WelcomePage extends StatefulWidget {
+
+class WelcomePage extends StatefulWidget 
+{
   const WelcomePage({Key? key}) : super(key: key);
 
 
@@ -17,8 +21,19 @@ class WelcomePageState extends State<WelcomePage>
   int currentIndex = 1;
   PageController pageController = PageController(initialPage: 1);
   FlutterBlue flutterBlue = FlutterBlue.instance;
+  
+  String userEmail = '';
+  String name = '';
+  String phone = '';
 
-  List<Map<String, dynamic>> lpn = 
+
+  @override
+  void initState() 
+  {
+    super.initState();
+  }
+
+  List<Map<String, dynamic>> lpns = 
   [
   {
     'icon': Icons.directions_car,
@@ -64,14 +79,47 @@ class WelcomePageState extends State<WelcomePage>
     Navigator.pushNamed(context, '/editprofile');
   }
 
+
+  Future<void> UpdateProfileData(String email) async 
+  {
+    final url = 'http://192.168.178.16:5000/users/$email'; 
+    try 
+    {
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200 || response.statusCode==201) 
+      {
+        final userData = jsonDecode(response.body);
+        setState(() 
+        {
+          name = userData['name'];
+          userEmail = userData['email'];
+          phone = userData['phone'];
+        });
+      } 
+      else 
+      {
+        throw Exception('Failed to load user data');
+      }
+    } 
+    catch (e) 
+    {
+      // Catch any exceptions that occur during the HTTP request
+      print('Error: $e');
+    }
+  }
+
+
+
   @override
   Widget build(BuildContext context) 
   {
+    Map<String, dynamic>? arguments = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    String email = arguments?['email'];
+
 
     //bgColor: 0xFF080a16
     //btn : 
     //      1/ 0xFF810cf5 *** 2/ 0xFF810cf5 *** 3/ 0xFFa64efc 
-
     // box : 0xFF141931
     
     return Scaffold
@@ -86,100 +134,144 @@ class WelcomePageState extends State<WelcomePage>
         children: <Widget>
         [
     
-       /* **************** C O N T A I N E R : PROFILE PAGE ******************* */
-          Container
+            /* **************** C O N T A I N E R : PROFILE PAGE ******************* */
+          GestureDetector
           (
-            key: Key('Profile'),
-            child: Column
+            onTap: () => UpdateProfileData(email),
+            child: Container
             (
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: 
-              [
-                    AppBar
+              key: Key('Profile'),
+              child: Column
+              (
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: 
+                [
+                  AppBar
+                  (
+                    automaticallyImplyLeading: false,
+                    title: const Text
                     (
-                      automaticallyImplyLeading: false,
-                      title: const Text
-                      (
                         "Profile",
-                        style: TextStyle
-                        (
-                          fontWeight: FontWeight.bold,
-                          fontSize: 25,
-                          color: Colors.white,
-                        ),
-                      ),
-
-      backgroundColor: Color(0xFF080a16),
-                      centerTitle: true,
-                    ),
-
-                  const SizedBox(height:30),
-
-                    Center
-                    (
-                      child: Container
-                      (
-                        width: 120,
-                        height: 120,
-                        decoration: BoxDecoration
-                        (
-                          shape: BoxShape.circle,
-                          
-                        ),
-                        child: Padding
-                        (
-                          padding: EdgeInsetsDirectional.fromSTEB(4, 4, 4, 4),
-                          child: ClipRRect
+                          style: TextStyle
                           (
-                            borderRadius: BorderRadius.circular(50),
-                            child: Image.asset
+                            fontWeight: FontWeight.bold,
+                            fontSize: 25,
+                            color: Colors.white,
+                          ),
+                        ),
+            
+                        backgroundColor: Color(0xFF080a16),
+                        centerTitle: true,
+                      ),
+            
+                    const SizedBox(height:30),
+            
+                      Center
+                      (
+                        child: Container
+                        (
+                          width: 120,
+                          height: 120,
+                          decoration: BoxDecoration
+                          (
+                            shape: BoxShape.circle,
+                            
+                          ),
+                          child: Padding
+                          (
+                            padding: EdgeInsetsDirectional.fromSTEB(4, 4, 4, 4),
+                            child: ClipRRect
                             (
-                              'images/logo.jpeg',
-                              width: 55,
-                              height: 55,
-                              fit: BoxFit.cover,
+                              borderRadius: BorderRadius.circular(50),
+                              child: Image.asset
+                              (
+                                'images/logo.jpeg',
+                                width: 55,
+                                height: 55,
+                                fit: BoxFit.cover,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-        
-                const SizedBox(height:20),
-
-                Center
-                (
-                  child: Container
+                    
+                  const SizedBox(height:20),
+            
+                  Center
                   (
-                    width: 350,
-                    height: 40,
-                    decoration: BoxDecoration
+                    child: Container
                     (
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-      
-                    child: Row
-                    (
-                      
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: 
-                      [
-                        SizedBox(width:15),
-
-                        Padding
-                        (
-                          padding: EdgeInsets.zero,
-                          child: Icon(Icons.person, color: Color(0xFF5e3b91),),
-                        ),
-
-                            SizedBox(width:15),
-      
-                          Container
+                      width: 350,
+                      height: 40,
+                      decoration: BoxDecoration
+                      (
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                  
+                      child: Row
+                      (
+                        
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: 
+                        [
+                          SizedBox(width:15),
+            
+                          Padding
                           (
-                            alignment: Alignment.center,
-                            child: Text
+                            padding: EdgeInsets.zero,
+                            child: Icon(Icons.person, color: Color(0xFF5e3b91),),
+                          ),
+            
+                              SizedBox(width:15),
+                  
+                            Container
                             (
-                              'Flen ben Flen',
+                              alignment: Alignment.center,
+                              child: Text
+                              (
+                                'Name',
+                                style: TextStyle
+                                (
+                                  color: Colors.black,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+            
+                  const SizedBox(height:20),
+            
+                  Center
+                  (
+                    child: Container
+                    (
+                      width: 350,
+                      height: 40,
+                      decoration: BoxDecoration
+                      (
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                  
+                      child: Row
+                      (
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: 
+                        [
+                          SizedBox(width:15),
+            
+                          Icon(Icons.mail, color: Color(0xFF5e3b91),),
+                  
+                            SizedBox(width:15),
+                  
+                            Text
+                            (
+                              'Email',
                               style: TextStyle
                               (
                                 color: Colors.black,
@@ -187,206 +279,157 @@ class WelcomePageState extends State<WelcomePage>
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                          ),x
-                        ],
-                      ),
-                    ),
-                  ),
-
-                const SizedBox(height:20),
-
-                Center
-                (
-                  child: Container
-                  (
-                    width: 350,
-                    height: 40,
-                    decoration: BoxDecoration
-                    (
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-      
-                    child: Row
-                    (
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: 
-                      [
-                        SizedBox(width:15),
-
-                        Icon(Icons.mail, color: Color(0xFF5e3b91),),
-      
-                            SizedBox(width:15),
-      
-                          Text
-                          (
-                            'xyz@xyz.com',
-                            style: TextStyle
-                            (
-                              color: Colors.black,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height:20),
-
-                Center
-                (
-                  child: Container
-                  (
-                    width: 350,
-                    height: 40,
-                    decoration: BoxDecoration
-                    (
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-      
-                    child: Row
-                    (
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: 
-                      [
-                        SizedBox(width:15),
-
-                        Icon(Icons.phone, color: Color(0xFF5e3b91),),
-      
-                            SizedBox(width:15),
-      
-                          Text
-                          (
-                            '99 999 999 ',
-                            style: TextStyle
-                            (
-                              color: Colors.black,
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-
-
-                Center
-                (
-                child: Container
-                (
-                  height: 90,
-                  width: 350, 
-                  child: ListView.builder
-                  (
-                    itemCount: lpn.length,
-                    itemBuilder: (BuildContext context, int index) 
-                    {
-                      return Container
-                      (
-                        width: 350,
-                        height: 40,
-                        margin: EdgeInsets.symmetric(vertical: 3),
-
-                        decoration: BoxDecoration
-                        (
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
+                          ],
                         ),
-
-                        child: Row
-                        (
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: 
-                          [                                                    
-                            SizedBox(width:15),
-
-                            Icon
-                            (
-                              lpn[index]['icon'],
-                              color: lpn[index]['iconColor'],
-                            ),
-
-                            SizedBox(width: 10),
-
+                      ),
+                    ),
+            
+                    const SizedBox(height:20),
+            
+                  Center
+                  (
+                    child: Container
+                    (
+                      width: 350,
+                      height: 40,
+                      decoration: BoxDecoration
+                      (
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                  
+                      child: Row
+                      (
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: 
+                        [
+                          SizedBox(width:15),
+            
+                          Icon(Icons.phone, color: Color(0xFF5e3b91),),
+                  
+                              SizedBox(width:15),
+                  
                             Text
                             (
-                              lpn[index]['plateNumber'],
-                              style: TextStyle(
+                              'Phone',
+                              style: TextStyle
+                              (
                                 color: Colors.black,
-                                fontSize: 20,
+                                fontSize: 22,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                           ],
                         ),
-                      );
-                    },
-                  ),
-                ),
-              ),
-
-      const SizedBox(height:60),
-
-                Center
-                (
-                  child: GestureDetector
-                  (
-                    onTap: Logout,
-                    child: Container
-                    (
-                      width: 200,
-                      height: 60,
-                      alignment: Alignment.center,
-                      
-                      decoration: BoxDecoration
-                      (
-                        color: Colors.black,
-                        borderRadius: BorderRadius.circular(20),
-                        gradient: RadialGradient
-                        (
-                          radius: 1,
-                          
-                          colors: <Color>
-                          [
-                            Color.fromARGB(255, 149, 97, 202),
-                            Color(0xFF810cf5),
-                            Color(0xFFa64efc),
-                          ]
-                        ),
-
-                        boxShadow: const 
-                        [
-                          BoxShadow
-                          (
-                            color: Colors.grey,
-                            offset: Offset.zero, 
-                            blurRadius: 15.0,
-                          ),
-                        ],
                       ),
-                    
-                      child: Padding
-                      (
-                        padding: EdgeInsets.all(15.0),
-                        child: Text
+                    ),
+            
+            
+                  Center
+                  (
+                  child: Container
+                  (
+                    height: 90,
+                    width: 350, 
+                    child: ListView.builder
+                    (
+                      itemCount: lpns.length,
+                      itemBuilder: (BuildContext context, int index) 
+                      {
+                        return Container
                         (
-                          'Logout ',
-                          style: TextStyle
+                          width: 350,
+                          height: 40,
+                          margin: EdgeInsets.symmetric(vertical: 3),
+            
+                          decoration: BoxDecoration
                           (
                             color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+            
+                          child: Row
+                          (
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: 
+                            [                                                    
+                              SizedBox(width:15),
+            
+                              Icon
+                              (
+                                lpns[index]['icon'],
+                                color: lpns[index]['iconColor'],
+                              ),
+            
+                              SizedBox(width: 10),
+            
+                              Text
+                              (
+                                lpns[index]['plateNumber'],
+                                style: TextStyle
+                                (
+                                  color: Colors.black,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+            
+                  const SizedBox(height:60),
+            
+                  Center
+                  (
+                    child: GestureDetector
+                    (
+                      onTap: Logout,
+                      child: Container
+                      (
+                        width: 200,
+                        height: 60,
+                        alignment: Alignment.center,
+                        
+                        decoration: BoxDecoration
+                        (
+                          color: Colors.black,
+                          borderRadius: BorderRadius.circular(20),
+                          gradient: RadialGradient
+                          (
+                            radius: 1,
+                            
+                            colors: <Color>
+                            [
+                              Color.fromARGB(255, 149, 97, 202),
+                              Color(0xFF810cf5),
+                              Color(0xFFa64efc),
+                            ]
+                          ),
+                        ),
+                      
+                        child: Padding
+                        (
+                          padding: EdgeInsets.all(15.0),
+                          child: Text
+                          (
+                            'Logout ',
+                            style: TextStyle
+                            (
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ),   
-              ],
+                  ),   
+                ],
+              ),
             ),
           ),
 
@@ -600,15 +643,6 @@ class WelcomePageState extends State<WelcomePage>
                         ),
                       
                         borderRadius: BorderRadius.circular(20),
-                        boxShadow: const 
-                        [
-                          BoxShadow
-                          (
-                            color: Colors.grey,
-                            offset: Offset.zero, 
-                            blurRadius: 15.0,
-                          ),
-                        ],
                       ),
                     
                       child: Padding

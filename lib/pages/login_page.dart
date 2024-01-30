@@ -6,7 +6,6 @@ import 'package:temp1/components/my_button.dart';
 import 'package:http/http.dart' as http;
 import 'package:crypto/crypto.dart';
 import 'dart:convert';
-import 'package:mongo_dart/mongo_dart.dart' as mongo;
 
 class LoginPage extends StatefulWidget 
 {
@@ -74,7 +73,7 @@ class LoginPageState extends State<LoginPage>
 
     setState(() 
     {
-      rememberUser = prefs.getBool('rememberUser') ?? false;
+      rememberUser = prefs.getBool('rememberUser') ?? true;
     });
   }
 
@@ -85,79 +84,63 @@ class LoginPageState extends State<LoginPage>
     return md5.convert(utf8.encode(input)).toString();
   }
 
-  /* **************** H T T P RQ F U N C T I O N ******************* */
-
-  /*Future<void> postData() async
-  {      
-    final url = Uri.parse('https://liger-divine-surely.ngrok-free.app'); 
-    final headers = {'Content-Type': 'application/json'};
-    final body = jsonEncode({'name': 'John Doe', 'email': 'john@example.com'});
-    final response = await http.post(url, headers: headers, body: body);
-    if (response.statusCode == 200) 
-    {
-      print('Data Sending Success.');
-    } 
-    else 
-    {
-      print('Error: ${response.statusCode}');
-    }
-  }*/
 
   
-  Future<void> Database ()
-  async 
-  {
-      var db = await mongo.Db.create("mongodb+srv://sbm2024:sbm2024_projet@cluster0.pud7wkc.mongodb.net/");
-      await db.open();
-  }
-
  /* **************** L O G I N  F U N C T I O N ******************* */
-  void signUserIn()
-  async 
+
+void signUserIn() async 
+{
+  String userEmail = emailController.text;
+  String userPassword = passwordController.text;
+
+  String passwordCrypted = cryptageData(userPassword);
+
+  // URL of your local server's API endpoint for user sign-in
+  var signInUrl = Uri.parse('http://192.168.178.16:5000/signin');
+
+  try 
   {
-    String userEmail = emailController.text;
-    String userPassword = passwordController.text;
-
-    String emailCrypted = cryptageData(userEmail);
-    String passwordCrypted = cryptageData(userPassword);
-
-    try 
-    {
-      var db = await mongo.Db.create
+    var response = await http.post
+    (
+      signInUrl,
+      headers: 
+      {
+        'Content-Type': 'application/json', // Specify content type
+      },
+      body: jsonEncode
       (
-        "mongodb+srv://sbm2024:sbm2024_projet@cluster0.pud7wkc.mongodb.net/");
-        await db.open();
-
-        var collection = db.collection('users');
-
-        var user = await collection.findOne(mongo.where.eq('email', emailCrypted));
-
-        if (user != null && user['password'] == passwordCrypted) 
         {
-          Navigator.pushNamed
-          (
-            context,
-            '/welcomepage',
-            arguments: 
-            {
-              'email': userEmail,
-              'password': userPassword,
-              'rem': rememberUser.toString(),
-            },
-          );
+          'email': userEmail,
+          'password': passwordCrypted,
         }
-        else 
-        {
-          debugPrint('User not found or password incorrect');
-        }
+      ),
+    );
 
-        await db.close();
-    } 
-    catch (e) 
+    if (response.statusCode == 200 || response.statusCode == 201) 
     {
-      debugPrint('Error connecting to the database: $e');
+      // User sign-in successful, navigate to welcome page
+      Navigator.pushNamed(
+        context,
+        '/welcomepage',
+        arguments: 
+        {
+          'email': userEmail,
+        },
+      );
     }
+     else 
+    {
+      // User sign-in failed
+      debugPrint('User not found or password incorrect');
+    }
+  } 
+  catch (e) 
+  {
+    // An error occurred during the HTTP request
+    debugPrint('Error: $e');
   }
+}
+
 
 
   /* **************** R E G I S T E R  F U N C T I O N ******************* */
