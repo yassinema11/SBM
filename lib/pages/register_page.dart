@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api, avoid_print, unused_local_variable, unused_label, unused_import, non_constant_identifier_names, use_build_context_synchronously
+// ignore_for_file: library_private_types_in_public_api, avoid_print, unused_local_variable, unused_label, unused_import, non_constant_identifier_names, use_build_context_synchronously, prefer_const_constructors
 
 import 'package:flutter/material.dart';
 import 'package:temp1/components/my_button.dart';
@@ -23,6 +23,8 @@ class RegisterPageState extends State<RegisterPage>
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confpasswordController = TextEditingController();
+  TextEditingController serverController = TextEditingController();
+  TextEditingController portController = TextEditingController();
 
   bool isObscureP = true;
   bool isObscureCP = true;
@@ -42,13 +44,107 @@ class RegisterPageState extends State<RegisterPage>
 
 
 
-/* **************** R E G I S T E R  F U N C T I O N ******************* */
+/* **************** Network  F U N C T I O N ******************* */
+void SettingsLogin() 
+  {
+    showDialog
+    (
+      context: context,
+      builder: (BuildContext context) 
+      {
+        return AlertDialog
+        (
+          title: const Text("Network Settings", style: TextStyle(color: Colors.white), textAlign: TextAlign.center,),
+          content: Column
+          (
+            mainAxisSize: MainAxisSize.min,
+            children: 
+            [
+              const Text("Add Server and Port to Connect", style: TextStyle(color: Colors.white)),
 
+              const SizedBox(height: 15),
 
-void signUserUp() async 
+              Container
+              (
+                height: 50,
+                decoration: BoxDecoration
+                (
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.grey[800],
+                ),
+
+                child: TextFormField
+                (
+                  controller: serverController,
+                  style: TextStyle(color: Colors.white),
+                  decoration: InputDecoration
+                  (
+                    labelText: 'Server',
+                    labelStyle: TextStyle(color: Colors.white),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                  ),
+                ),
+              ),
+              SizedBox(height: 16),
+
+              Container
+              (
+                height: 50,
+                decoration: BoxDecoration
+                (
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.grey[800],
+                ),
+
+                child: TextFormField
+                (
+                  controller: portController,
+                  style: TextStyle(color: Colors.white),
+                  decoration: InputDecoration
+                  (
+                    labelText: 'Port',
+                    labelStyle: TextStyle(color: Colors.white),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          backgroundColor: Colors.black,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          actions: <Widget>
+          [
+            ElevatedButton
+            (
+              child: const Text("Save", style: TextStyle(color: Colors.black)),
+              onPressed: () 
+              {
+                // Save data to SharedPreferences
+                saveSettings(serverController.text, portController.text);
+
+                // Close the dialog
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+void saveSettings(String server, String port) async 
 {
-        print('Data  ');
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setString('server', server);
+  await prefs.setString('port', port);
+}
 
+/* **************** Register F U N C T I O N ******************* */
+
+void signUserUp() async
+ {
   String userEmail = emailController.text;
   String userPassword = passwordController.text;
   String userPhoneNumber = phoneController.text;
@@ -56,7 +152,18 @@ void signUserUp() async
   String passwordCrypted = cryptageData(userPassword);
 
   // URL of your backend server's API endpoint for user sign-up
-  var signUpUrl = Uri.parse('http://192.168.178.16:5000/signup');
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String server = prefs.getString('server') ?? '192.168.178.16'; // Default server if not found
+  String port = prefs.getString('port') ?? '5000'; // Default port if not found
+
+  if (server.isEmpty || port.isEmpty) 
+  {
+    // Handle case where server or port is empty
+    debugPrint('Server or port not specified in SharedPreferences');
+    return;
+  }
+
+  var signUpUrl = Uri.parse('http://$server:$port/signup');
 
   try 
   {
@@ -65,39 +172,42 @@ void signUserUp() async
       signUpUrl,
       headers: 
       {
-        'Content-Type': 'application/json', 
+        'Content-Type': 'application/json'
       },
       body: jsonEncode
       (
         {
-        'email': userEmail,
-        'password': passwordCrypted,
-        'phone': userPhoneNumber,
-        }
+          'email': userEmail,
+          'password': passwordCrypted,
+          'phone': userPhoneNumber,
+        } 
       ),
     );
 
-    if (response.statusCode == 200 || response.statusCode==201) 
+    if (response.statusCode == 200 || response.statusCode == 201) 
     {
-      print('Data success');
+      // User sign-up successful
+      print('User sign-up successful');
       Navigator.pushNamed
       (
         context,
         '/loginpage',
         arguments: 
         {
-          'email': userEmail,
-          'password': userPassword,
+          'email': userEmail, 
+          'password': userPassword
         },
       );
     } 
     else 
     {
+      // User sign-up failed
       debugPrint('User sign-up failed with status: ${response.statusCode}');
     }
   } 
   catch (e) 
   {
+    // An error occurred during the HTTP request
     debugPrint('Error: $e');
   }
 }
@@ -116,7 +226,7 @@ void signUserUp() async
     return Scaffold
     (
       resizeToAvoidBottomInset: false,
-      backgroundColor: Colors.grey[300],
+      backgroundColor: const Color(0xFF080a16),
       body: SafeArea
       (
         child: Form
@@ -129,17 +239,48 @@ void signUserUp() async
             (
               children: 
               [
-                const SizedBox(height: 30),
+                GestureDetector
+                (
+                  onTap: SettingsLogin,
+                  child: const Row
+                  (
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: 
+                    [
+                      Padding
+                      (
+                        padding: EdgeInsets.symmetric(horizontal: 25, vertical: 5),
+                        child: Icon(Icons.settings,color: Colors.white,size: 35),
+                      ),
+                    ],
+                  ),
+                ),
+
+
+                const SizedBox(height: 20),
+
 
        /* **************** L O G O : S B M  ******************* */
 
-                Center
+                Container
                 (
-                  child: Image.asset
+                    width: 300,
+                    height: 150,
+                    decoration: BoxDecoration
+                    (
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+
+                  child: Center
                   (
-                    'images/logo_sheidt.png',
-                    height: 200,
-                    width: 350,
+                    /* **************** L O G O : S B M  ******************* */
+                    child: Image.asset
+                    (
+                      'images/logo_sheidt.png',
+                      height: 200,
+                      width: 200,
+                    ),
                   ),
                 ),
 
@@ -150,7 +291,7 @@ void signUserUp() async
                 Text
                 (
                   "Register to know more",
-                  style: TextStyle(color: Colors.grey[850], fontSize: 20),
+                  style: TextStyle(color: Colors.white, fontSize: 20),
                 ),
 
                 const SizedBox(height: 20),

@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:temp1/pages/edit_profile.dart';
 import 'package:temp1/pages/forgot_password.dart';
@@ -15,12 +17,7 @@ void main()
 
 class MyApp extends StatelessWidget 
 {
-  const MyApp
-  (
-    {
-      super.key
-    }
-  );
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) 
@@ -30,16 +27,22 @@ class MyApp extends StatelessWidget
       debugShowCheckedModeBanner: false,
       home: const LoginPage(),
 
+      theme: ThemeData
+      (
+        // Define your theme here
+        // Example:
+        // primaryColor: Colors.blue,
+        // accentColor: Colors.green,
+      ),
+
       routes: 
       {
         '/loginpage': (context) => const LoginPage(),
-        '/registerpage': (context) =>  const RegisterPage(),
-        '/welcomepage': (context) => const WelcomePage(),
+        '/registerpage': (context) => const RegisterPage(),
+        '/welcomepage': (context) => WelcomePage(),
         '/forgotpassword': (context) => const ForgotPassword(),
         '/editprofile': (context) => const EditProfile(),
-
       },
     );
   }
 }
-

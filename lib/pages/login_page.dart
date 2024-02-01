@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api, avoid_print, non_constant_identifier_names, unused_import, unused_local_variable, use_build_context_synchronously, unused_element
+// ignore_for_file: library_private_types_in_public_api, avoid_print, non_constant_identifier_names, unused_import, unused_local_variable, use_build_context_synchronously, unused_element, prefer_const_constructors
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -21,6 +21,9 @@ class LoginPageState extends State<LoginPage>
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
+  TextEditingController serverController = TextEditingController();
+  TextEditingController portController = TextEditingController();
+
   bool rememberUser = false;
   bool isObscure = true;
 
@@ -37,7 +40,7 @@ class LoginPageState extends State<LoginPage>
   async 
   {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool hasSavedCredentials = prefs.getBool('rememberUser') ?? false;
+    bool hasSavedCredentials = prefs.getBool('rememberUser') ?? true;
 
     if (hasSavedCredentials) 
     {
@@ -59,11 +62,10 @@ class LoginPageState extends State<LoginPage>
   void saveUserCredentials(String userEmail, String userPassword) 
   async 
   {
-    String emailCrypted = cryptageData(userEmail);
     String passwordCrypted = cryptageData(userPassword);
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('userEmail', emailCrypted);
+    prefs.setString('userEmail', userEmail);
     prefs.setString('userPassword', passwordCrypted);
   }
 
@@ -88,47 +90,63 @@ class LoginPageState extends State<LoginPage>
   
  /* **************** L O G I N  F U N C T I O N ******************* */
 
-void signUserIn() async 
-{
+
+ void signUserIn() async 
+ {
   String userEmail = emailController.text;
   String userPassword = passwordController.text;
 
   String passwordCrypted = cryptageData(userPassword);
-
-  // URL of your local server's API endpoint for user sign-in
-  var signInUrl = Uri.parse('http://192.168.178.16:5000/signin');
+  String Sign = "signin";
 
   try 
   {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String server = prefs.getString('server') ?? '192.168.178.16'; // Default server if not found
+    String port = prefs.getString('port') ?? '5000'; // Default port if not found
+
+    if (server.isEmpty || port.isEmpty) 
+    {
+      // Handle case where server or port is empty
+      debugPrint('Server or port not specified in SharedPreferences');
+      return;
+    }
+
+    // URL of your local server's API endpoint for user sign-in
+    var signInUrl = Uri.parse('http://$server:$port/$Sign');
+
     var response = await http.post
     (
       signInUrl,
       headers: 
       {
-        'Content-Type': 'application/json', // Specify content type
-      },
+        'Content-Type': 'application/json'
+      }, // Specify content type
       body: jsonEncode
       (
         {
-          'email': userEmail,
-          'password': passwordCrypted,
-        }
+          'email': userEmail, 
+          'password': passwordCrypted
+        },
       ),
     );
 
     if (response.statusCode == 200 || response.statusCode == 201) 
     {
-      // User sign-in successful, navigate to welcome page
-      Navigator.pushNamed(
+      // User sign-in successful
+      saveUserEmail(userEmail);
+
+      Navigator.pushNamed
+      (
         context,
         '/welcomepage',
         arguments: 
         {
-          'email': userEmail,
+          'userEmail': userEmail
         },
       );
-    }
-     else 
+    } 
+    else 
     {
       // User sign-in failed
       debugPrint('User not found or password incorrect');
@@ -140,6 +158,21 @@ void signUserIn() async
     debugPrint('Error: $e');
   }
 }
+
+
+
+  void saveUserEmail(String userEmail) async 
+  {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.setString('user', userEmail);
+  }
+
+  void saveSettings(String server, String port) async 
+  {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('server', server);
+    await prefs.setString('port', port);
+  }
 
 
 
@@ -166,6 +199,97 @@ void signUserIn() async
       );
   }
 
+  void SettingsLogin() 
+  {
+    showDialog
+    (
+      context: context,
+      builder: (BuildContext context) 
+      {
+        return AlertDialog
+        (
+          title: const Text("Network Settings", style: TextStyle(color: Colors.white), textAlign: TextAlign.center,),
+          content: Column
+          (
+            mainAxisSize: MainAxisSize.min,
+            children: 
+            [
+              const Text("Add Server and Port to Connect", style: TextStyle(color: Colors.white)),
+
+              const SizedBox(height: 15),
+
+              Container
+              (
+                height: 50,
+                decoration: BoxDecoration
+                (
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.grey[800],
+                ),
+
+                child: TextFormField
+                (
+                  controller: serverController,
+                  style: TextStyle(color: Colors.white),
+                  decoration: InputDecoration
+                  (
+                    labelText: 'Server',
+                    labelStyle: TextStyle(color: Colors.white),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                  ),
+                ),
+              ),
+              SizedBox(height: 16),
+
+              Container
+              (
+                height: 50,
+                decoration: BoxDecoration
+                (
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.grey[800],
+                ),
+
+                child: TextFormField
+                (
+                  controller: portController,
+                  style: TextStyle(color: Colors.white),
+                  decoration: InputDecoration
+                  (
+                    labelText: 'Port',
+                    labelStyle: TextStyle(color: Colors.white),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          backgroundColor: Colors.black,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          actions: <Widget>
+          [
+            ElevatedButton
+            (
+              child: const Text("Save", style: TextStyle(color: Colors.black)),
+              onPressed: () 
+              {
+                // Save data to SharedPreferences
+                saveSettings(serverController.text, portController.text);
+
+                // Close the dialog
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
+ 
 
 
   @override
@@ -173,11 +297,12 @@ void signUserIn() async
   {
     Map<String, dynamic>? arguments = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
 
-    if (arguments != null && arguments.containsKey('email') && arguments.containsKey('password')) 
+    if (arguments != null && arguments.containsKey('email')) 
     {
       emailController.text = arguments['email'];
       passwordController.text = arguments['password'];
     }
+
 
       /* **************** S C A F F O L D ******************* */
 
@@ -200,7 +325,26 @@ void signUserIn() async
             (
               children: 
               [
+
+                GestureDetector
+                (
+                  onTap: SettingsLogin,
+                  child: const Row
+                  (
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: 
+                    [
+                      Padding
+                      (
+                        padding: EdgeInsets.symmetric(horizontal: 25, vertical: 5),
+                        child: Icon(Icons.settings,color: Colors.white,size: 35),
+                      ),
+                    ],
+                  ),
+                ),
+
                 const SizedBox(height: 50),
+
                 Container
                 (
                     width: 300,
