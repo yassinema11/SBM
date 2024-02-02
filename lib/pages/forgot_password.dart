@@ -42,22 +42,23 @@ class ForgotPasswordState extends State<ForgotPassword>
     return Scaffold
     (
       resizeToAvoidBottomInset: false,
-      backgroundColor: Colors.grey[300],
+      backgroundColor: const Color(0xFF080a16),
 
       appBar: AppBar
       (
+        backgroundColor: const Color(0xFF080a16),
         title: const Text
         (
           "Forgot Password",
           style: 
             TextStyle
             (
+              color: Colors.white,
               fontWeight: FontWeight.bold,
               fontSize: 25,
             ),
           ),
           
-          backgroundColor: Colors.grey[300],
           centerTitle: true,
           leading: GestureDetector
           (
@@ -65,7 +66,8 @@ class ForgotPasswordState extends State<ForgotPassword>
             child: const Icon
             (
               Icons.arrow_back,
-              color: Colors.black,
+              color: Colors.white,
+              size: 30,
             ),
         ),
       ),  
@@ -81,16 +83,17 @@ class ForgotPasswordState extends State<ForgotPassword>
             [
               const SizedBox(height: 30),
 
-              Text
+              const Text
               (
                 "Enter your Email ",
-                style: TextStyle(color: Colors.grey[850], fontSize: 20),
+                style: TextStyle(color: Colors.white, fontSize: 20,fontWeight: FontWeight.bold),
               ),
 
               const SizedBox(height: 20),
 
               /* **************** F I E L D : Email ******************* */
-              SizedBox(
+              SizedBox
+              (
                 height: 70,
                 width: 350,
 

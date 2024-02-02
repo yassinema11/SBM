@@ -36,11 +36,12 @@ class LoginPageState extends State<LoginPage>
   }
 
     /* **************** Check and SignIN  F U N C T I O N ******************* */
+
   Future<void> checkAndSignIn() 
   async 
   {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool hasSavedCredentials = prefs.getBool('rememberUser') ?? true;
+    bool hasSavedCredentials = prefs.getBool('rememberUser') ?? false;
 
     if (hasSavedCredentials) 
     {
@@ -87,9 +88,14 @@ class LoginPageState extends State<LoginPage>
   }
 
 
+  void saveUserEmail(String userEmail) async 
+  {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.setString('user', userEmail);
+  }
+
   
  /* **************** L O G I N  F U N C T I O N ******************* */
-
 
  void signUserIn() async 
  {
@@ -102,17 +108,15 @@ class LoginPageState extends State<LoginPage>
   try 
   {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String server = prefs.getString('server') ?? '192.168.178.16'; // Default server if not found
-    String port = prefs.getString('port') ?? '5000'; // Default port if not found
+    String server = prefs.getString('server') ?? '192.168.178.16';
+    String port = prefs.getString('port') ?? '5000';
 
     if (server.isEmpty || port.isEmpty) 
     {
-      // Handle case where server or port is empty
       debugPrint('Server or port not specified in SharedPreferences');
       return;
     }
 
-    // URL of your local server's API endpoint for user sign-in
     var signInUrl = Uri.parse('http://$server:$port/$Sign');
 
     var response = await http.post
@@ -121,51 +125,38 @@ class LoginPageState extends State<LoginPage>
       headers: 
       {
         'Content-Type': 'application/json'
-      }, // Specify content type
+      }, 
       body: jsonEncode
       (
         {
           'email': userEmail, 
-          'password': passwordCrypted
+          'password': passwordCrypted,
         },
       ),
     );
 
     if (response.statusCode == 200 || response.statusCode == 201) 
     {
-      // User sign-in successful
       saveUserEmail(userEmail);
-
       Navigator.pushNamed
       (
         context,
         '/welcomepage',
-        arguments: 
-        {
-          'userEmail': userEmail
-        },
       );
     } 
     else 
     {
-      // User sign-in failed
       debugPrint('User not found or password incorrect');
     }
   } 
   catch (e) 
   {
-    // An error occurred during the HTTP request
     debugPrint('Error: $e');
   }
 }
 
 
-
-  void saveUserEmail(String userEmail) async 
-  {
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    pref.setString('user', userEmail);
-  }
+  
 
   void saveSettings(String server, String port) async 
   {
@@ -186,17 +177,17 @@ class LoginPageState extends State<LoginPage>
   /* **************** Password forget  F U N C T I O N ******************* */
   void PassForget() 
   {
-      String userEmail = emailController.text;
+    String userEmail = emailController.text;
 
-      Navigator.pushNamed
-      (
-        context,
-        '/forgotpassword',
-        arguments: 
-        {
-          'email': userEmail,
-        },
-      );
+    Navigator.pushNamed
+    (
+      context,
+      '/forgotpassword',
+      arguments: 
+      {
+        'email': userEmail,
+      },
+    );
   }
 
   void SettingsLogin() 
@@ -208,15 +199,25 @@ class LoginPageState extends State<LoginPage>
       {
         return AlertDialog
         (
-          title: const Text("Network Settings", style: TextStyle(color: Colors.white), textAlign: TextAlign.center,),
+          title: const Text
+          (
+            "Network Settings", 
+            style: TextStyle(color: Colors.white), 
+            textAlign: TextAlign.center,
+          ),
+
           content: Column
           (
             mainAxisSize: MainAxisSize.min,
             children: 
             [
-              const Text("Add Server and Port to Connect", style: TextStyle(color: Colors.white)),
+              const Text
+              (
+                "Add Server and Port to Connect", 
+                style: TextStyle(color: Colors.white)
+              ),
 
-              const SizedBox(height: 15),
+        const SizedBox(height: 15),
 
               Container
               (
@@ -266,6 +267,7 @@ class LoginPageState extends State<LoginPage>
               ),
             ],
           ),
+
           backgroundColor: Colors.black,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           actions: <Widget>
@@ -275,10 +277,8 @@ class LoginPageState extends State<LoginPage>
               child: const Text("Save", style: TextStyle(color: Colors.black)),
               onPressed: () 
               {
-                // Save data to SharedPreferences
                 saveSettings(serverController.text, portController.text);
 
-                // Close the dialog
                 Navigator.of(context).pop();
               },
             ),
@@ -287,9 +287,6 @@ class LoginPageState extends State<LoginPage>
       },
     );
   }
-
-
- 
 
 
   @override
@@ -367,9 +364,7 @@ class LoginPageState extends State<LoginPage>
                   ),
                 ),
 
-                const SizedBox(height: 60),
-
-                
+      const SizedBox(height: 60), 
                 
         /* **************** T E X T : WELCOME BACK ******************* */
 
@@ -381,8 +376,8 @@ class LoginPageState extends State<LoginPage>
 
                 const SizedBox(height: 20),
 
-        /* **************** F I E L D : EMAIL ******************* */
 
+        /* **************** F I E L D : EMAIL ******************* */
                 SizedBox
                 (
                   height: 70,
@@ -563,6 +558,7 @@ class LoginPageState extends State<LoginPage>
                 const Padding
                 (
                   padding: EdgeInsets.symmetric(horizontal: 30.0),
+                  
                   child: Row
                   (
                     children: 

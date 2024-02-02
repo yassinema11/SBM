@@ -2,150 +2,79 @@
 
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_blue/flutter_blue.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:temp1/pages/home.dart';
+import 'package:temp1/pages/profile.dart';
+import 'package:temp1/pages/settings.dart';
 
 
-class WelcomePage extends StatefulWidget {
+class WelcomePage extends StatefulWidget 
+{
   const WelcomePage({Key? key}) : super(key: key);
 
   @override
   State<WelcomePage> createState() => WelcomePageState();
 }
 
-class WelcomePageState extends State<WelcomePage> {
-  int currentIndex = 1;
-  PageController pageController = PageController(initialPage: 1);
-  late String UE = "tester";
-  late String name = "Name";
-  late String mail = "Email";
-  late String phone = "Phone";
+class WelcomePageState extends State<WelcomePage> 
+{
+    final items = const 
+    [
+      Icon(Icons.person, size: 30,),
+      Icon(Icons.home, size: 30,),
+      Icon(Icons.settings, size: 30,),
+    ];
 
-  @override
-  void initState() {
+    int index = 1;
+
+    @override
+  void initState() 
+  {
     super.initState();
-    initializeUserProfileData();
   }
-
-  Future<void> initializeUserProfileData() async {
-    print('Initializing user profile data...');
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? userEmail = prefs.getString('user');
-
-    if (userEmail != null) {
-      await updateProfileData(userEmail);
-    } else {
-      print('User email is null');
-    }
-
-    // Initialize UE here with a default value if it's still not set
-    if (UE.isEmpty) {
-      UE = "Default User";
-      print('Initialized UE with default value: $UE');
-    }
-  }
-
-  List<Map<String, dynamic>> lpns = [
-    {
-      'icon': Icons.directions_car,
-      'iconColor': Color(0xFF5e3b91),
-      'plateNumber': '1234 TU 55',
-    }
-  ];
-
-  void Logout() {
-    Navigator.pushNamed(context, '/loginpage');
-  }
-
-  void OpenGate() {
-    print('Button Clicked');
-  }
-
-  void Update() {
-    Navigator.pushNamed(context, '/editprofile');
-  }
-
-  Future<void> updateProfileData(String userEmail) async {
-    try {
-      if (userEmail == null) {
-        print('User email is null');
-        return;
-      }
-
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String server = prefs.getString('server') ?? '192.168.178.16'; // Default server if not found
-      String port = prefs.getString('port') ?? '5000'; // Default port if not found
-
-      final url = 'http://$server:$port/user?email=$userEmail';
-      print(userEmail);
-      final response = await http.get(
-        Uri.parse(url),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final userData = jsonDecode(response.body);
-
-        setState(() {
-          // Update state with user data
-          name = userData['name'] ?? 'test'; // Check for null and provide default value
-          mail = userData['email'] ?? 'aaaa'; // Check for null and provide default value
-          phone = userData['phone'] ?? '11111'; // Check for null and provide default value
-
-          print(name);
-          print(mail);
-          print(phone);
-        });
-      } else if (response.statusCode == 404) {
-        // User not found
-        print("User not found");
-      } else {
-        // Other HTTP errors
-        print("Failed to load user data: ${response.statusCode}");
-      }
-    } catch (e) {
-      // Catch any exceptions that occur during the HTTP request
-      print('Error fetching user data: $e');
-    }
-  }
-
+ 
+ 
+  
   @override
-  void dispose() {
-    pageController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    print('Context is null: ${context == null}');
-
-    bool dataLoaded = name.isNotEmpty && mail.isNotEmpty && phone.isNotEmpty;
-    if (!dataLoaded) {
-      return Center(
-        child: CircularProgressIndicator(),
-      );
-    }
-
-    if (pageController != null && context != null) {
-      try {
-      return Scaffold
+  Widget build(BuildContext context) 
+  {
+    return Scaffold
     (
-      resizeToAvoidBottomInset: false,
-      
-      
-      backgroundColor: Color(0xFF080a16),
-    
-      body: PageView
+      bottomNavigationBar: CurvedNavigationBar
       (
-        controller: pageController,
-        children: <Widget>
-        [
+        height: 50,
+        items: items,
+        index: index,        
+        buttonBackgroundColor: Color(0xFFFFD1E3),
+        backgroundColor: Color(0xFF080a16),
+
+        animationDuration: const Duration(milliseconds: 10),
+        animationCurve: Curves.easeInOut,
     
-            /* **************** C O N T A I N E R : PROFILE PAGE ******************* */
+       onTap: (selctedIndex)
+       {
+          setState(()
+          {
+            index = selctedIndex;
+          });
+        },
+
+      ),
+
+      resizeToAvoidBottomInset: false,
+          
+      body: Container
+      (
+        width: double.infinity,
+        height: double.infinity,
+        
+        
+        child: getSelectedWidget(index: index)
+      ),
+    
+    /* **************** C O N T A I N E R : PROFILE PAGE ******************* 
           Container
           (
             key: Key('Profile'),
@@ -168,7 +97,7 @@ class WelcomePageState extends State<WelcomePage> {
                         ),
                       ),
           
-                      backgroundColor: Color(0xFF080a16),
+                      backgroundColor: const Color(0xFF080a16),
                       centerTitle: true,
                     ),
           
@@ -238,7 +167,7 @@ class WelcomePageState extends State<WelcomePage> {
                             alignment: Alignment.center,
                             child: Text
                             (
-                              name,
+                              "name",
                               style: TextStyle
                               (
                                 color: Colors.black,
@@ -279,7 +208,7 @@ class WelcomePageState extends State<WelcomePage> {
                 
                           Text
                           (
-                            mail,
+                            "Mail",
                             style: TextStyle
                             (
                               color: Colors.black,
@@ -319,7 +248,7 @@ class WelcomePageState extends State<WelcomePage> {
                 
                           Text
                           (
-                            phone,
+                            "phone",
                             style: TextStyle
                             (
                               color: Colors.black,
@@ -389,7 +318,7 @@ class WelcomePageState extends State<WelcomePage> {
                 ),
               ),
           
-                const SizedBox(height:60),
+        const SizedBox(height:60),
           
                 Center
                 (
@@ -438,11 +367,11 @@ class WelcomePageState extends State<WelcomePage> {
                 ),   
               ],
             ),
-          ),
+          ),*/
 
 
     
-    /* **************** C O N T A I N E R : HOME PAGE ******************* */
+    /* **************** C O N T A I N E R : HOME PAGE ******************* 
           Container
           (
             child: Column
@@ -467,7 +396,7 @@ class WelcomePageState extends State<WelcomePage> {
                   centerTitle: true,
                 ),
     
-                const SizedBox(height:30),
+            const SizedBox(height:30),
     
                 Center
                 (
@@ -501,7 +430,7 @@ class WelcomePageState extends State<WelcomePage> {
                           ),
                         ),
       
-                            SizedBox(width:150),
+            SizedBox(width:150),
       
                           Text
                           (
@@ -518,7 +447,7 @@ class WelcomePageState extends State<WelcomePage> {
                     ),
                   ),
     
-             const SizedBox(height:50),
+            const SizedBox(height:50),
     
                 Row
                 (
@@ -550,7 +479,7 @@ class WelcomePageState extends State<WelcomePage> {
                         ),
                       ),
                     
-                        SizedBox(width:10),
+            SizedBox(width:10),
                     
                       Text
                       (
@@ -595,7 +524,7 @@ class WelcomePageState extends State<WelcomePage> {
                         ),
                       ),
                     
-                        SizedBox(width:10),
+             SizedBox(width:10),
                     
                       Text
                       (
@@ -610,7 +539,7 @@ class WelcomePageState extends State<WelcomePage> {
                   ),
 
 
-                const SizedBox(height:70),
+            const SizedBox(height:70),
     
                 Center
                 (
@@ -622,7 +551,7 @@ class WelcomePageState extends State<WelcomePage> {
                     ),
                 ),
     
-                  const SizedBox(height: 50),
+              const SizedBox(height: 50),
     
                 Center
                 (
@@ -670,8 +599,8 @@ class WelcomePageState extends State<WelcomePage> {
                   ),
                 ),   
     
-                const SizedBox(height: 30),
-    
+              const SizedBox(height: 30),
+  
                 /*Column
                 (
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -710,13 +639,15 @@ class WelcomePageState extends State<WelcomePage> {
                       ),
                     ),
                   ],
+
+                  
                 ),*/      
               ],
             ),
-          ),
+          ),*/
     
 
-          /* **************** C O N T A I N E R : SETTINGS PAGE ******************* */
+    /* **************** C O N T A I N E R : SETTINGS PAGE ******************* 
 
           Container
           (
@@ -737,65 +668,43 @@ class WelcomePageState extends State<WelcomePage> {
               centerTitle: true,
             ),
 
-          ),
-        ],
+          ),*/
+        
       
 
-        onPageChanged: (int index) 
+        /*onPageChanged: (int index) 
         {
           setState(() 
           {
             currentIndex = index;
           });
-        },
-      ),
+        },*/
+      
     
-      bottomNavigationBar: CurvedNavigationBar
-      (
-        height: 50,
-        index: currentIndex,
-        buttonBackgroundColor: Color(0xFFFFD1E3),
-        backgroundColor: Colors.transparent,
-        
-        items: const 
-        [
-          Icon(Icons.person, color: Color(0xFF5e3b91),),
-          Icon(Icons.home,color: Color(0xFF5e3b91)),
-          Icon(Icons.settings,color: Color(0xFF5e3b91)),
-        ],
-        animationDuration: const Duration(milliseconds: 10),
-        animationCurve: Curves.easeInOut,
-    
-        onTap: (index) 
-        {
-          setState(() 
-          {
-            currentIndex = index;
-            pageController.jumpToPage(index);
-          });
-        },
-
-        letIndexChange: (index) => true,
-
-      ),
     );
-    } 
-    catch (e) 
+  } 
+
+   Widget getSelectedWidget({required int index})
+   {
+    Widget widget;
+    switch(index)
     {
-      print('Error initializing PageView: $e');
-      return Center
-      (
-        child: Text('Error occurred. Please try again.'),
-      );
+
+      case 0:
+        widget = const Profile();
+        break;
+
+      case 2:
+        widget = const Settings();
+        break;
+
+      default:
+        widget = const Home();
+        break;
     }
-    } 
-    else 
-    {
-    // Handle case when pageController or context is null
-    return Center
-      (
-        child: Text('Error: Page controller or context is null.'),
-    );
+
+    return widget;
   }
-  }
-  }
+}
+
+

@@ -44,8 +44,8 @@ class RegisterPageState extends State<RegisterPage>
 
 
 
-/* **************** Network  F U N C T I O N ******************* */
-void SettingsLogin() 
+  /* **************** Network  F U N C T I O N ******************* */
+  void SettingsLogin() 
   {
     showDialog
     (
@@ -86,6 +86,7 @@ void SettingsLogin()
                   ),
                 ),
               ),
+
               SizedBox(height: 16),
 
               Container
@@ -112,8 +113,10 @@ void SettingsLogin()
               ),
             ],
           ),
+
           backgroundColor: Colors.black,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+
           actions: <Widget>
           [
             ElevatedButton
@@ -121,10 +124,8 @@ void SettingsLogin()
               child: const Text("Save", style: TextStyle(color: Colors.black)),
               onPressed: () 
               {
-                // Save data to SharedPreferences
                 saveSettings(serverController.text, portController.text);
 
-                // Close the dialog
                 Navigator.of(context).pop();
               },
             ),
@@ -151,14 +152,12 @@ void signUserUp() async
 
   String passwordCrypted = cryptageData(userPassword);
 
-  // URL of your backend server's API endpoint for user sign-up
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  String server = prefs.getString('server') ?? '192.168.178.16'; // Default server if not found
-  String port = prefs.getString('port') ?? '5000'; // Default port if not found
+  String server = prefs.getString('server') ?? '192.168.178.16';
+  String port = prefs.getString('port') ?? '5000';
 
   if (server.isEmpty || port.isEmpty) 
   {
-    // Handle case where server or port is empty
     debugPrint('Server or port not specified in SharedPreferences');
     return;
   }
@@ -186,7 +185,6 @@ void signUserUp() async
 
     if (response.statusCode == 200 || response.statusCode == 201) 
     {
-      // User sign-up successful
       print('User sign-up successful');
       Navigator.pushNamed
       (
@@ -201,18 +199,16 @@ void signUserUp() async
     } 
     else 
     {
-      // User sign-up failed
-      debugPrint('User sign-up failed with status: ${response.statusCode}');
+      debugPrint('User sign-up failed with status (user already exist): ${response.statusCode}');
     }
   } 
   catch (e) 
   {
-    // An error occurred during the HTTP request
     debugPrint('Error: $e');
   }
 }
 
-    /* **************** L O G I N    F U N C T I O N ******************* */
+    /* **************** L O G I N   F U N C T I O N ******************* */
 
   void signUserIn() 
   {
