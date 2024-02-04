@@ -1,4 +1,4 @@
-// ignore_for_file: file_names, prefer_const_constructors, non_constant_identifier_names, avoid_print, deprecated_member_use, unused_import, avoid_function_literals_in_foreach_calls, unnecessary_null_comparison
+// ignore_for_file: avoid_print, unused_local_variable, non_constant_identifier_names, deprecated_member_use, unused_import, file_names
 
 import 'dart:io';
 import 'dart:typed_data';
@@ -13,46 +13,42 @@ class Home extends StatefulWidget
   State<Home> createState() => HomeState();
 }
 
-
 class HomeState extends State<Home> 
 {
   bool isScanning = false;
   BluetoothDevice? connectedDevice;
+  late String Blt;
+  bool isBluetoothConnected = false;
 
   @override
   void initState() 
   {
     super.initState();
-    BLT();
+    BltStat();
   }
 
-  Future<void> connectToDevice(BluetoothDevice device) async 
+  Future<void> BltStat() async 
   {
     try 
     {
-      // Connect to the device
-      await device.connect();
-      print('Connected to ${device.name}');
-
-      // Store the connected device
-      connectedDevice = device;
-
-      // After connecting, send a specific UID (replace with your UID data)
-      await _sendCustomSignal();
-
-      // Listen to connection state changes
-      var connectionSubscription = connectedDevice!.connectionState.listen((state) 
+      // Check if Bluetooth is supported
+      if (!(await FlutterBluePlus.isAvailable)) 
       {
-        if (state == BluetoothConnectionState.disconnected) 
-        {
-          // Handle device disconnected
-          print("Device disconnected");
-        }
-      });
+        print("Bluetooth is not available on this device");
+        return;
+      }
 
-      // Cancel the subscription to prevent duplicate listeners
-      connectedDevice!.cancelWhenDisconnected(connectionSubscription,
-          delayed: true, next: true);
+      // Check if Bluetooth is turned on
+      if (!(await FlutterBluePlus.isOn)) 
+      {
+        print("Bluetooth is not turned on");
+        return;
+      }
+
+      setState(() 
+      {
+        isBluetoothConnected = true;
+      });
     } 
     catch (e) 
     {
@@ -60,412 +56,194 @@ class HomeState extends State<Home>
     }
   }
 
-  void OpenGate() async 
-  {
-    try 
-    {
-      // Check if the connected device is not null
-      if (connectedDevice == null)
-      {
-        print('No device connected');
-        return;
-      }
-
-      // Send a specific UID to the connected device
-      await _sendCustomSignal();
-    } 
-    catch (e) 
-    {
-      print('Error opening gate: $e');
-    }
-  }
-
-  Future<void> BLT() async 
-  {
-    if (!(await FlutterBluePlus.isSupported)) 
-    {
-      debugPrint("Bluetooth not supported by this device");
-      return;
-    }
-
-    // Listen to Bluetooth adapter state changes
-    var subscription = FlutterBluePlus.adapterState.listen((state) 
-    {
-      print(state);
-      if (state == BluetoothAdapterState.on) 
-      {
-        // Start scanning for devices
-        scan();
-      } 
-      else 
-      {
-        debugPrint("Error SCAN");
-        // Handle Bluetooth adapter state off
-      }
-    });
-
-    // Turn on Bluetooth for Android (for iOS, user controls Bluetooth state)
-    if (Platform.isAndroid) 
-    {
-      await FlutterBluePlus.turnOn();
-    } 
-    else 
-    {
-      print('Please manually enable Bluetooth in your device settings.');
-    }
-
-    // Cancel the subscription to prevent duplicate listeners
-    subscription.cancel();
-  }
-
-  Future<void> scan() async 
-  {
-    setState(() 
-    {
-      isScanning = true;
-    });
-
-    var subscription = FlutterBluePlus.onScanResults.listen((results) 
-    {
-      for (ScanResult r in results) 
-      {
-        print('${r.device.remoteId}: "${r.advertisementData.advName}" found!');
-        // Connect to a specific device when found
-        if (r.device.name == "Bluno") 
-        {
-          connectToDevice(r.device);
-        }
-      }
-    }, onError: (e) => print(e));
-
-    FlutterBluePlus.cancelWhenScanComplete(subscription);
-  }
-
-  Future<void> _sendCustomSignal() async 
+  Future<void> OpenGate() async 
   {
     // Generate your custom signal data (replace with your data)
-    final customSignalData = [0x12, 0x34, 0x56, 0x78];
+    final customSignalData = [0x00, 0x00, 0x00, 0x00];
 
     // Create an Eddystone UID frame with your custom signal data
     final eddystoneFrame = EddystoneUidFrame
     (
-      namespaceId: [0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF], // Example namespace ID
+      namespaceId: [0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF], 
       instanceId: customSignalData, // Use your custom signal data as the instance ID
     );
 
-    try 
-    {
-      // Discover services and characteristics
-      List<BluetoothService> services = await connectedDevice!.discoverServices();
-
-      // Find the write characteristic
-      BluetoothCharacteristic? writeCharacteristic;
-      services.forEach((service) 
-      {
-        service.characteristics.forEach((characteristic) 
-        {
-          if (characteristic.properties.write) {
-            writeCharacteristic = characteristic;
-          }
-        });
-      });
-
-      // If write characteristic is found, write the Eddystone UID frame to it
-      if (writeCharacteristic != null) 
-      {
-        await writeCharacteristic!.write(eddystoneFrame.frameBytes);
-        print('BLE Signal Sent Successfully');
-      } 
-      else 
-      {
-        print('Write characteristic not found');
-      }
-    } 
-    catch (e) 
-    {
-      print('Error sending BLE signal: $e');
-    }
+    print('BLE Signal Sent Successfully');
   }
-
 
   @override
   Widget build(BuildContext context) 
   {
-    return  Scaffold
+    return Scaffold
     (
       resizeToAvoidBottomInset: false,
-      backgroundColor: Color(0xFF080a16),
-
-          body:Column
+      backgroundColor: const Color(0xFF080a16),
+      body: Column
+      (
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: 
+        [
+          AppBar
           (
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: 
-            [
-              AppBar
+            automaticallyImplyLeading: false,
+            title: const Text
+            (
+              "Welcome",
+              style: TextStyle
               (
-                automaticallyImplyLeading: false,
-                title: const Text
-                (
-                  "Welcome",
-                  style: TextStyle
-                  (
-                    fontWeight: FontWeight.bold,
-                    fontSize: 25,
-                    color: Colors.white,
-                  ),
-                ),
-                backgroundColor: Color(0xFF080a16),
-                centerTitle: true,
+                fontWeight: FontWeight.bold,
+                fontSize: 25,
+                color: Colors.white,
               ),
-              
-          const SizedBox(height:30),
-              
-              Center
-              (
-                child: Container
-                (
-                  width: 350,
-                  height: 60,
-                  decoration: BoxDecoration
-                  (
-                      color: Color(0xFFA367B1),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                
-                  child: const Row
-                  (
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: 
-                    [
-                      Padding
-                      (
-                        padding: EdgeInsets.all(15.0),
-                        child: Text
-                        (
-                          'Free Places',
-                          style: TextStyle
-                          (
-                            color: Colors.white,
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                
-          SizedBox(width:150),
-                
-                        Text
-                        (
-                          '00',
-                          style: TextStyle
-                          (
-                            color: Colors.white,
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              
-          const SizedBox(height:50),
-              
-              Row
-              (
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: 
-                [  
-                  Center
-                  (
-                    child: Image.asset
-                    (
-                        'images/Connected.png',
-                        width: 25,
-                        height: 25,
-                    ),
-                  ),             
-                  
-                    Padding
-                    (
-                      padding: EdgeInsets.all(10.0),
-                      child: Text
-                      (
-                        'Bluetooth :',
-                        style: TextStyle
-                        (
-                          color: Colors.white,
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  
-          SizedBox(width:10),
-                  
-                    Text
-                    (
-                      'Connected',
-                      style: TextStyle
-                      (
-                        color: Colors.green,
-                        fontSize: 22,
-                      ),
-                    ),
-                  ],
-                ),
-          
-              
-              Row
-              (
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: 
-                [  
-                  Center
-                  (
-                    child: Image.asset
-                    (
-                        'images/not_connected.png',
-                        width: 25,
-                        height: 25,
-                    ),
-                  ),             
-                  
-                    Padding
-                    (
-                      padding: EdgeInsets.all(10.0),
-                      child: Text
-                      (
-                        'BLE :',
-                        style: TextStyle
-                        (
-                          color: Colors.white,
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  
-           SizedBox(width:10),
-                  
-                    Text
-                    (
-                      'Not in range',
-                      style: TextStyle
-                      (
-                        color: Colors.red,
-                        fontSize: 22,
-                      ),
-                    ),
-                  ],
-                ),
-          
-          
-          const SizedBox(height:70),
-              
-              Center
-              (
-                child: Image.asset
-                  (
-                    'images/main.png',
-                      width: 200,
-                      height: 200,
-                  ),
+            ),
+            backgroundColor: const Color(0xFF080a16),
+            centerTitle: true,
+          ),
+          const SizedBox(height: 30),
+          Center
+          (
+            child: Container
+            (
+              width: 350,
+              height: 60,
+              decoration: BoxDecoration(
+                color: const Color(0xFFA367B1),
+                borderRadius: BorderRadius.circular(20),
               ),
-              
-            const SizedBox(height: 50),
-              
-              Center
-              (
-                child: GestureDetector
-                (
-                  onTap: OpenGate,
-                  child: Container
-                  (
-                    width: 200,
-                    height: 100,
-                    alignment: Alignment.center,
-                    
-                    decoration: BoxDecoration
-                    (
-                      gradient: RadialGradient
-                      (
-                        radius: 1,
-                        
-                        colors: const <Color>
-                        [
-                          Color.fromARGB(255, 149, 97, 202),
-                          Color(0xFF810cf5),
-                          Color(0xFFa64efc),
-                        ]
-                      ),
-                    
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  
-                    child: Padding
-                    (
-                      padding: EdgeInsets.all(15.0),
-                      child: Text
-                      (
-                        'Click to OPEN',
-                        style: TextStyle
-                        (
-                          color: Colors.white,
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),   
-              
-            const SizedBox(height: 30),
-            
-              /*Column
+              child: const Row
               (
                 mainAxisAlignment: MainAxisAlignment.start,
-                children:
+                children: 
                 [
-                  Text
+                  Padding
                   (
-                    'Parking FULL',
-                    style: TextStyle
+                    padding: EdgeInsets.all(15.0),
+                    child: Text
                     (
-                      color: Colors.red,
-                      fontSize: 22,
-                      fontWeight: FontWeight.normal,
+                      'Free Places',
+                      style: TextStyle
+                      (
+                        color: Colors.white,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                    
-                  Text
-                  (
-                    'Another Comment',
+                  SizedBox(width: 150),
+                  Text(
+                    '00',
                     style: TextStyle
                     (
-                      color: Colors.yellow[800],
+                      color: Colors.white,
                       fontSize: 22,
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-              
-                  Text
-                  (
-                    'Hellllo',
-                    style: TextStyle
-                    (
-                      color: Colors.green[600],
-                      fontSize: 22,
-                      fontWeight: FontWeight.normal,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ],
-          
-                
-              ),*/      
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 50),
+
+          Row
+          (
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: 
+            [
+              Center
+              (
+                child: Image.asset
+                (
+                  isBluetoothConnected ? 'images/Connected.png' : 'images/not_connected.png',
+                  width: 25,
+                  height: 25,
+                ),
+              ),
+              const Padding
+              (
+                padding: EdgeInsets.all(10.0),
+                child: Text
+                (
+                  'Bluetooth :',
+                  style: TextStyle
+                  (
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+
+              const SizedBox(width: 10),
+
+              Text
+              (
+                isBluetoothConnected ? 'Connected' : 'Not connected',
+                style: TextStyle
+                (
+                  color: isBluetoothConnected ? Colors.green : Colors.red,
+                  fontSize: 22,
+                ),
+              ),
             ],
           ),
+
+          const SizedBox(height: 70),
+
+          Center
+          (
+            child: Image.asset
+            (
+              'images/main.png',
+              width: 200,
+              height: 200,
+            ),
+          ),
+          const SizedBox(height: 50),
+          Center
+          (
+            child: GestureDetector
+            (
+              onTap: OpenGate,
+              child: Container
+              (
+                width: 200,
+                height: 100,
+                alignment: Alignment.center,
+                decoration: BoxDecoration
+                (
+                  gradient: const RadialGradient
+                  (
+                    radius: 1,
+                    colors: <Color>[
+                      Color.fromARGB(255, 149, 97, 202),
+                      Color(0xFF810cf5),
+                      Color(0xFFa64efc),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Padding
+                (
+                  padding: EdgeInsets.all(15.0),
+                  child: Text
+                  (
+                    'Click to OPEN',
+                    style: TextStyle
+                    (
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 30),
+        ],
+      ),
     );
   }
 }

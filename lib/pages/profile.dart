@@ -1,6 +1,7 @@
-// ignore_for_file: prefer_const_constructors, file_names, prefer_const_literals_to_create_immutables, sized_box_for_whitespace, avoid_print, unnecessary_null_comparison, non_constant_identifier_names, unused_local_variable, unused_element
+// ignore_for_file: prefer_const_constructors, file_names, prefer_const_literals_to_create_immutables, sized_box_for_whitespace, avoid_print, unnecessary_null_comparison, non_constant_identifier_names, unused_local_variable, unused_element, use_build_context_synchronously
 
 import 'dart:convert';
+import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -21,9 +22,11 @@ class ProfileState extends State<Profile>
   late String name = "Name";
   late String mail = "Email";
   late String phone = "Phone";
+  late String curpas = "Password";
+  late String newpas = "Password";
+
   late List<Map<String, dynamic>> lpns = [];
   
-
   @override
   void initState() 
   {
@@ -37,6 +40,11 @@ class ProfileState extends State<Profile>
     Navigator.pushNamed(context, '/loginpage');
   }
 
+  String cryptageData(String input) 
+  {
+    return md5.convert(utf8.encode(input)).toString();
+  }
+  
   Future<void> ProfileData() async 
   {
 
@@ -76,10 +84,14 @@ class ProfileState extends State<Profile>
 
           setState(() 
           {
-            name = userData['name'];
-            mail = userData['email'];
-            phone = userData['phone'];
-          });
+            name = userData['name'] ?? ''; 
+            mail = userData['email'] ?? ''; 
+            phone = userData['phone'] ?? '';
+            curpas = userData['password'] ?? '';
+            
+            dynamic lpnsData = userData['lpns'] ?? [];
+            lpns = (lpnsData is List) ? List<Map<String, dynamic>>.from(lpnsData) : [];
+           });
         } 
         else if (response.statusCode == 404) 
         {
@@ -92,14 +104,14 @@ class ProfileState extends State<Profile>
 
         /*final lpnsResponse = await http.get
         (
-          Uri.parse(lpnsUrl),
+          Uri.parse(userUrl),
           headers: <String, String>
           {
             'Content-Type': 'application/json; charset=UTF-8',
           },
-        );*/
+        );
 
-        /*if (lpnsResponse.statusCode == 200) 
+        if (lpnsResponse.statusCode == 200) 
         {
           final lpnsData = jsonDecode(lpnsResponse.body);
 
@@ -112,17 +124,232 @@ class ProfileState extends State<Profile>
         {
           print("Failed to load lpns data: ${lpnsResponse.statusCode}");
         }*/
-      } 
+      }
       catch (e) 
       {
         print('Error fetching user data: $e');
       }
   }
 
-  void Update() 
+  Future<void> showUpdateUserDialog() async 
   {
-    Navigator.pushNamed(context, '/editprofile');
+    String newName = name;
+    String newMail = mail;
+    String newPhone = phone;
+    String actualPassword = curpas;
+    String newPassword = newpas;
+
+
+    return showDialog
+    (
+      context: context,
+      builder: (BuildContext context) 
+      {
+        return AlertDialog
+        (
+          backgroundColor: Color(0xFF080a16),
+          title: Text
+          (
+            'Update Profile',
+            style: TextStyle
+            (
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+
+          content: SingleChildScrollView
+          (
+            child: Column
+            (
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>
+              [
+                Container
+                (
+                  height: 60,
+                  decoration: BoxDecoration
+                  (
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.grey[800],
+                  ),
+                  child: TextField
+                  (                  
+                    style: TextStyle(color: Colors.white),
+                    onChanged: (value) => newName = value,
+                    decoration: InputDecoration
+                    (
+                      labelText: 'Name',                    
+                      labelStyle: TextStyle(color: Colors.white),                    
+                      border: InputBorder.none,                    
+                      contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                    ),
+                  ),
+                ),
+
+                        const SizedBox(height: 15),
+
+                Container
+                (
+                  height: 60,
+                  decoration: BoxDecoration
+                  (
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.grey[800],
+
+                  ),
+                  child: TextField
+                  (    
+                    style: TextStyle(color: Colors.white),
+                    onChanged: (value) => newMail = value,
+                    decoration: InputDecoration
+                    (
+                      labelText: 'Email',
+                      labelStyle: TextStyle(color: Colors.white),                    
+                      border: InputBorder.none,                    
+                      contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                    ),
+                  ),
+                ),
+
+                        const SizedBox(height: 15),
+
+                Container
+                (
+                  height: 60,
+                  decoration: BoxDecoration
+                  (
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.grey[800],
+                  ),
+                  child: TextField
+                  (                    
+                    style: TextStyle(color: Colors.white),
+                    onChanged: (value) => newPhone = value,
+                    decoration: InputDecoration
+                    (
+                      labelText: 'Phone',
+                      labelStyle: TextStyle(color: Colors.white),                    
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                    ),
+                  ),
+                ),
+
+        const SizedBox(height: 15),
+
+                Container
+                (
+                  height: 60,
+                  decoration: BoxDecoration
+                  (
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.grey[800],
+
+                  ),
+                  child: TextField
+                  (    
+                    style: TextStyle(color: Colors.white),
+                    onChanged: (value) => curpas = value,
+                    decoration: InputDecoration
+                    (
+                      labelText: 'Current Password',
+                      labelStyle: TextStyle(color: Colors.white),                    
+                      border: InputBorder.none,                    
+                      contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                    ),
+                  ),
+                ),
+
+             const SizedBox(height: 15),
+
+                Container
+                (
+                  height: 60,
+                  decoration: BoxDecoration
+                  (
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.grey[800],
+
+                  ),
+                  child: TextField
+                  (    
+                    style: TextStyle(color: Colors.white),
+                    onChanged: (value) => newpas = value,
+                    decoration: InputDecoration
+                    (
+                      labelText: 'New Password',
+                      labelStyle: TextStyle(color: Colors.white),                    
+                      border: InputBorder.none,                    
+                      contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                    ),
+                  ),
+                ),
+                
+              ],
+            ),
+          ),
+          actions: <Widget>
+          [
+            ElevatedButton
+            (
+              onPressed: () async 
+              {
+                // Save the updated data to the database
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                String server = prefs.getString('server') ?? '192.168.178.16';
+                String port = prefs.getString('port') ?? '5000';
+
+                final userUrl = 'http://$server:$port/user?email=$mail';
+                final response = await http.put
+                (
+                  Uri.parse(userUrl),
+                  headers: <String, String>
+                  {
+                    'Content-Type': 'application/json; charset=UTF-8',
+                  },
+                  body: jsonEncode(<String, dynamic>
+                  {
+                    'name': newName,
+                    'email': newMail,
+                    'phone': newPhone,
+                  }),
+                );
+
+                if (response.statusCode == 200) 
+                {
+                  setState(() 
+                  {
+                    name = newName;
+                    mail = newMail;
+                    phone = newPhone;
+                    print("User data Updated Successfully . . .");
+                  });
+                  Navigator.of(context).pop();
+                }
+                else 
+                {
+                  print('Failed to update user: ${response.statusCode}');
+                }
+              },
+              child: Text('Update'),
+            ),
+
+            ElevatedButton
+            (
+              onPressed: () 
+              {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
   }
+
+
 
   @override
   Widget build(BuildContext context) 
@@ -153,6 +380,24 @@ class ProfileState extends State<Profile>
                         
                         backgroundColor: Color(0xFF080a16),
                         centerTitle: true,
+                        actions: 
+                        [
+                           Padding
+                           (
+                             padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                             child: IconButton
+                             (
+                                icon: Icon
+                                (
+                                  Icons.edit,
+                                  color: Colors.white,
+                                  size: 30,
+                                ),
+                                tooltip: 'Edit Profile',
+                                onPressed: showUpdateUserDialog,
+                            ),
+                           )  
+                        ],
                       ),
                         
                     const SizedBox(height:30),
@@ -356,7 +601,7 @@ class ProfileState extends State<Profile>
                         
                               Text
                               (
-                                lpns[index]['plateNumber'],
+                                lpns[index]['plateNumber'] ?? '',
                                 style: TextStyle
                                 (
                                   color: Colors.black,

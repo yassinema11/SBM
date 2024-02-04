@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:temp1/pages/Home.dart';
-import 'package:temp1/pages/edit_profile.dart';
 import 'package:temp1/pages/forgot_password.dart';
 import 'package:temp1/pages/login_page.dart';
 import 'package:temp1/pages/profile.dart';
@@ -44,7 +43,6 @@ class MyApp extends StatelessWidget
         '/registerpage': (context) => const RegisterPage(),
         '/welcomepage': (context) => WelcomePage(),
         '/forgotpassword': (context) => const ForgotPassword(),
-        '/editprofile': (context) => const EditProfile(),
         '/profile': (context) => const Profile(),
         '/home': (context) => const Home(),
         '/settings': (context) => const Settings(),
