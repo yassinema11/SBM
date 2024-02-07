@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:beacon_broadcast/beacon_broadcast.dart';
 
 class Home extends StatefulWidget 
 {
@@ -19,6 +20,7 @@ class HomeState extends State<Home>
   BluetoothDevice? connectedDevice;
   late String Blt;
   bool isBluetoothConnected = false;
+  BeaconBroadcast beaconBroadcast = BeaconBroadcast();
 
   @override
   void initState() 
@@ -56,6 +58,15 @@ class HomeState extends State<Home>
 
   Future<void> OpenGate() async 
   {
+
+    beaconBroadcast
+    .setUUID('39ED98FF-2900-441A-802F-9C398FC199D2')
+    .setMajorId(1)
+    .setMinorId(100)
+    .start();
+
+
+    /*
     final customSignalData = [0x00, 0x00, 0x00, 0x00];
 
     final eddystoneFrame = EddystoneUidFrame
@@ -63,6 +74,7 @@ class HomeState extends State<Home>
       namespaceId: [0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF], 
       instanceId: customSignalData,
     );
+    */
 
     print('BLE Signal Sent Successfully');
   }
@@ -95,7 +107,7 @@ class HomeState extends State<Home>
             backgroundColor: const Color(0xFF080a16),
             centerTitle: true,
           ),
-          const SizedBox(height: 30),
+          const SizedBox(height: 20),
           Center
           (
             child: Container
@@ -141,7 +153,7 @@ class HomeState extends State<Home>
             ),
           ),
 
-          const SizedBox(height: 50),
+          const SizedBox(height: 40),
 
           Row
           (
@@ -186,7 +198,7 @@ class HomeState extends State<Home>
             ],
           ),
 
-          const SizedBox(height: 70),
+          const SizedBox(height: 50),
 
           Center
           (
@@ -198,7 +210,7 @@ class HomeState extends State<Home>
             ),
           ),
 
-          const SizedBox(height: 50),
+          const SizedBox(height: 40),
 
           Center
           (

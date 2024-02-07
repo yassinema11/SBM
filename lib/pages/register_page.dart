@@ -279,7 +279,7 @@ void signUserUp() async
                   Container
                   (
                       width: MediaQuery.of(context).size.width-100,
-                      height: 150,
+                      height: 120,
                       decoration: BoxDecoration
                       (
                         color: Colors.white,
@@ -292,8 +292,8 @@ void signUserUp() async
                       child: Image.asset
                       (
                         'images/logo_sheidt.png',
-                        height: 200,
-                        width: 200,
+                        height: 180,
+                        width: 180,
                       ),
                     ),
                   ),
@@ -314,7 +314,7 @@ void signUserUp() async
         
                   SizedBox
                   (
-                    height: 70,
+                    height: 50,
                     width: MediaQuery.of(context).size.width-70,
                     child: TextFormField
                     (
@@ -368,7 +368,7 @@ void signUserUp() async
         
                   SizedBox
                   (
-                    height: 70,
+                    height: 50,
                     width: MediaQuery.of(context).size.width-70,
                     child: TextFormField
                     (
@@ -409,7 +409,7 @@ void signUserUp() async
         
                   SizedBox
                   (
-                    height: 70,
+                    height: 50,
                     width: MediaQuery.of(context).size.width-70,
                     child: TextFormField
                     (
@@ -476,7 +476,7 @@ void signUserUp() async
         
                   SizedBox
                   (
-                    height: 70,
+                    height: 50,
                     width: MediaQuery.of(context).size.width-70,
                     child: TextFormField
                     (

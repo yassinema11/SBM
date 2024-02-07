@@ -114,6 +114,7 @@ class LoginPageState extends State<LoginPage>
       text: 'Please add your email and password',
       backgroundColor: Colors.black,
     );
+    return;
   }
 
   else
@@ -198,8 +199,6 @@ class LoginPageState extends State<LoginPage>
 }
 
 
-  
-
   void saveSettings(String server, String port) async 
   {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -283,6 +282,7 @@ class LoginPageState extends State<LoginPage>
                   ),
                 ),
               ),
+
               SizedBox(height: 16),
 
               Container
@@ -384,7 +384,7 @@ class LoginPageState extends State<LoginPage>
                     ),
                   ),
         
-                  const SizedBox(height: 50),
+                  const SizedBox(height: 40),
         
                   Container
                   (
@@ -408,7 +408,7 @@ class LoginPageState extends State<LoginPage>
                     ),
                   ),
         
-        const SizedBox(height: 60), 
+        const SizedBox(height: 40), 
                   
           /* **************** T E X T : WELCOME BACK ******************* */
         
@@ -436,10 +436,12 @@ class LoginPageState extends State<LoginPage>
                           return 'Email is required';
                         }
         
-                        /*else if (!value!.contains('@')) 
+                        /*
+                        else if (!value!.contains('@')) 
                         {
                           return 'Invalid email format';
-                        }*/
+                        }
+                        */
                         return null;
                       },
         
@@ -476,7 +478,7 @@ class LoginPageState extends State<LoginPage>
                   SizedBox
                   (
                     height: 70,
-                      width: MediaQuery.of(context).size.width-60,
+                    width: MediaQuery.of(context).size.width-60,
                     child: TextFormField
                     (
                       controller: passwordController,
@@ -540,33 +542,37 @@ class LoginPageState extends State<LoginPage>
 
                     children: 
                     [
-                      Row
+                      SizedBox
                       (
-                        children: 
-                        [
-                        /* **************** C H E C K B O X ******************* */
-                          Checkbox
-                          (
-                            value: rememberUser,
-                            onChanged: (value) 
-                            {
-                              setState(() 
+                        width: MediaQuery.of(context).size.width-200,
+                        child: Row
+                        (
+                          children: 
+                          [
+                          /* **************** C H E C K B O X ******************* */
+                            Checkbox
+                            (
+                              value: rememberUser,
+                              onChanged: (value) 
                               {
-                                rememberUser = value!;
-                              });
-                            },
-                          ),
-                          const Text
-                          (
-                            "Remember me",
-                              style: TextStyle(color: Colors.white),
-                          ),
-                        ],
+                                setState(() 
+                                {
+                                  rememberUser = value!;
+                                });
+                              },
+                            ),
+                            const Text
+                            (
+                              "Remember me",
+                                style: TextStyle(color: Colors.white),
+                            ),
+                          ],
+                        ),
                       ),
         
-                      const SizedBox(width: 70),
+                      const SizedBox(width: 30),
         
-                      /* **************** T E X T  B U T T O N  ******************* */
+                      /* **************** T E X T  B U T T O N : forget password  ******************* */
                       TextButton
                       (
                         onPressed: () 
@@ -584,7 +590,8 @@ class LoginPageState extends State<LoginPage>
             //      1/ 0xFF810cf5 *** 2/ 0xFF810cf5 *** 3/ 0xFFa64efc 
         
             // box : 0xFF141931
-                  const SizedBox(height: 30),
+            
+                  const SizedBox(height: 25),
                   
           /* **************** L O G I N  B U T T O N  ******************* */
                   MyButton
