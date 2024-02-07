@@ -1,9 +1,12 @@
-// ignore_for_file: prefer_const_constructors, file_names, prefer_const_literals_to_create_immutables, sized_box_for_whitespace, avoid_print, unnecessary_null_comparison, non_constant_identifier_names, unused_local_variable, unused_element, use_build_context_synchronously
+// ignore_for_file: prefer_const_constructors, file_names, prefer_const_literals_to_create_immutables, sized_box_for_whitespace, avoid_print, unnecessary_null_comparison, non_constant_identifier_names, unused_local_variable, unused_element, use_build_context_synchronously, unused_label, unused_import
 
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
+import 'package:flutter_profile_picture/flutter_profile_picture.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Profile extends StatefulWidget 
@@ -22,8 +25,8 @@ class ProfileState extends State<Profile>
   late String name = "Name";
   late String mail = "Email";
   late String phone = "Phone";
-  late String curpas = "Password";
-  late String newpas = "Password";
+  late String curpas = "Current Password";
+  late String newpas = "New Password";
 
   late List<Map<String, dynamic>> lpns = [];
   
@@ -34,11 +37,38 @@ class ProfileState extends State<Profile>
     ProfileData();
   }
   
-
-  void Logout() 
+  void Logout() async 
   {
-    Navigator.pushNamed(context, '/loginpage');
+
+    QuickAlert.show
+    (
+      context: context,
+      type: QuickAlertType.confirm,
+      text: 'Do you want to logout',
+      title: 'Are you Sure ? ',
+      textColor:Colors.black,
+      titleColor: Colors.white,
+      confirmBtnColor:Colors.green,
+      onConfirmBtnTap: ()
+      async 
+      {
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.remove('user');
+          Navigator.pushNamed(context, '/loginpage');
+      },
+
+      onCancelBtnTap: () 
+      {
+        Navigator.pop(context);
+      },
+
+      confirmBtnText: 'Yes',
+      cancelBtnText: 'No',
+    );
+
+  
   }
+
 
   String cryptageData(String input) 
   {
@@ -51,35 +81,34 @@ class ProfileState extends State<Profile>
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? Em = prefs.getString('user');
 
-    
-      try 
+    try 
+    {
+      if (Em == null) 
       {
-        if (Em == null) 
+        print('User email is null');
+        return;
+      }
+
+
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String server = prefs.getString('server') ?? '192.168.178.16';
+      String port = prefs.getString('port') ?? '5000';
+
+      final userUrl = 'http://$server:$port/user?email=$Em';
+      //final lpnsUrl = 'http://$server:$port/lpns';
+
+      final response = await http.get
+      (
+        Uri.parse(userUrl),
+        headers: <String, String>
         {
-          print('User email is null');
-          return;
-        }
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      );
 
 
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        String server = prefs.getString('server') ?? '192.168.178.16';
-        String port = prefs.getString('port') ?? '5000';
-
-        final userUrl = 'http://$server:$port/user?email=$Em';
-        //final lpnsUrl = 'http://$server:$port/lpns';
-
-        final response = await http.get
-        (
-          Uri.parse(userUrl),
-          headers: <String, String>
-          {
-            'Content-Type': 'application/json; charset=UTF-8',
-          },
-        );
-
-
-        if (response.statusCode == 200 || response.statusCode == 201) 
-        {
+      if (response.statusCode == 200 || response.statusCode == 201) 
+      {
           final userData = jsonDecode(response.body);
 
           setState(() 
@@ -88,7 +117,7 @@ class ProfileState extends State<Profile>
             mail = userData['email'] ?? ''; 
             phone = userData['phone'] ?? '';
             curpas = userData['password'] ?? '';
-            
+
             dynamic lpnsData = userData['lpns'] ?? [];
             lpns = (lpnsData is List) ? List<Map<String, dynamic>>.from(lpnsData) : [];
            });
@@ -196,8 +225,8 @@ class ProfileState extends State<Profile>
                   (
                     borderRadius: BorderRadius.circular(10),
                     color: Colors.grey[800],
-
                   ),
+
                   child: TextField
                   (    
                     style: TextStyle(color: Colors.white),
@@ -245,7 +274,6 @@ class ProfileState extends State<Profile>
                   (
                     borderRadius: BorderRadius.circular(10),
                     color: Colors.grey[800],
-
                   ),
                   child: TextField
                   (    
@@ -270,7 +298,6 @@ class ProfileState extends State<Profile>
                   (
                     borderRadius: BorderRadius.circular(10),
                     color: Colors.grey[800],
-
                   ),
                   child: TextField
                   (    
@@ -295,8 +322,18 @@ class ProfileState extends State<Profile>
             (
               onPressed: () async 
               {
-                // Save the updated data to the database
                 SharedPreferences prefs = await SharedPreferences.getInstance();
+                String actualStoredPassword = prefs.getString('password') ?? '';
+                
+                if (actualPassword != actualStoredPassword) 
+                {
+                  print('Current password is incorrect');
+                  return;
+                }
+
+                String hashedNewPassword = cryptageData(newPassword);
+
+                // Save the updated data to the database
                 String server = prefs.getString('server') ?? '192.168.178.16';
                 String port = prefs.getString('port') ?? '5000';
 
@@ -313,6 +350,7 @@ class ProfileState extends State<Profile>
                     'name': newName,
                     'email': newMail,
                     'phone': newPhone,
+                    'password': hashedNewPassword,
                   }),
                 );
 
@@ -323,9 +361,23 @@ class ProfileState extends State<Profile>
                     name = newName;
                     mail = newMail;
                     phone = newPhone;
+
+
                     print("User data Updated Successfully . . .");
+
+                    QuickAlert.show
+                    (
+                      context: context,
+                      type: QuickAlertType.success,
+                      text: 'Updated Successfully!',
+                      disableBackBtn: false,
+                    );
                   });
-                  Navigator.of(context).pop();
+
+                  Future.delayed(Duration(seconds: 1), () 
+                  {           
+                    Navigator.of(context).pop();
+                  });
                 }
                 else 
                 {
@@ -411,21 +463,17 @@ class ProfileState extends State<Profile>
                           decoration: BoxDecoration
                           (
                             shape: BoxShape.circle,
-                            
                           ),
                           child: Padding
                           (
                             padding: EdgeInsetsDirectional.fromSTEB(4, 4, 4, 4),
-                            child: ClipRRect
+                            child: ProfilePicture
                             (
-                              borderRadius: BorderRadius.circular(50),
-                              child: Image.asset
-                              (
-                                'images/logo.jpeg',
-                                width: 55,
-                                height: 55,
-                                fit: BoxFit.cover,
-                              ),
+                              name: name,
+                              radius: 31,
+                              fontsize: 45,
+                              tooltip: true,
+                              role: 'User',
                             ),
                           ),
                         ),
@@ -447,7 +495,6 @@ class ProfileState extends State<Profile>
                   
                       child: Row
                       (
-                        
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: 
                         [
@@ -503,24 +550,24 @@ class ProfileState extends State<Profile>
                         
                           Icon(Icons.mail, color: Color(0xFF5e3b91),),
                   
-                            SizedBox(width:15),
+                          SizedBox(width:15),
                   
-                            Text
+                          Text
+                          (
+                            mail,
+                            style: TextStyle
                             (
-                              mail,
-                              style: TextStyle
-                              (
-                                color: Colors.black,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              color: Colors.black,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
+                  ),
                         
-                    const SizedBox(height:20),
+          const SizedBox(height:20),
                         
                   Center
                   (
@@ -543,22 +590,22 @@ class ProfileState extends State<Profile>
                         
                           Icon(Icons.phone, color: Color(0xFF5e3b91),),
                   
-                              SizedBox(width:15),
+                          SizedBox(width:15),
                   
-                            Text
+                          Text
+                          (
+                            phone,
+                            style: TextStyle
                             (
-                              phone,
-                              style: TextStyle
-                              (
-                                color: Colors.black,
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              color: Colors.black,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
+                  ),
                         
                         
                   Center
@@ -623,7 +670,7 @@ class ProfileState extends State<Profile>
                   (
                     child: GestureDetector
                     (
-                      //onTap: Logout,
+                      onTap: Logout,
                       child: Container
                       (
                         width: 200,

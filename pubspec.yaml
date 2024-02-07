@@ -42,6 +42,11 @@ dependencies:
   curved_navigation_bar: ^1.0.3
   flutter_blue_plus: ^1.31.13
   image_picker: ^1.0.7
+  quickalert: ^1.0.2  
+  flutter_profile_picture: ^2.0.0
+  flutter_screen_scaler: ^2.1.0
+
+  #flutter_email_sender: ^6.0.2
 
 
 

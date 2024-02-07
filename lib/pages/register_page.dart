@@ -1,6 +1,8 @@
 // ignore_for_file: library_private_types_in_public_api, avoid_print, unused_local_variable, unused_label, unused_import, non_constant_identifier_names, use_build_context_synchronously, prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:temp1/components/my_button.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -114,7 +116,7 @@ class RegisterPageState extends State<RegisterPage>
             ],
           ),
 
-          backgroundColor: Colors.black,
+          backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
 
           actions: <Widget>
@@ -186,17 +188,30 @@ void signUserUp() async
     if (response.statusCode == 200 || response.statusCode == 201) 
     {
       print('User sign-up successful');
-      Navigator.pushNamed
+
+      QuickAlert.show
       (
-        context,
-        '/loginpage',
-        arguments: 
-        {
-          'email': userEmail, 
-          'password': userPassword
-        },
+        context: context,
+        type: QuickAlertType.success,
+        text: 'Registered Successfully!',
+        showConfirmBtn:false,	
       );
-    } 
+      // Adding a delay of 2 seconds before navigating to the login page
+      Future.delayed(Duration(seconds: 3), () 
+      {
+        Navigator.pushNamed
+        (
+          context,
+          '/loginpage',
+          arguments: 
+          {
+            'email': userEmail,
+            'password': userPassword,
+          },
+        );
+      });
+    }
+
     else 
     {
       debugPrint('User sign-up failed with status (user already exist): ${response.statusCode}');
@@ -221,374 +236,378 @@ void signUserUp() async
   {
     return Scaffold
     (
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       backgroundColor: const Color(0xFF080a16),
-      body: SafeArea
+
+      body: SingleChildScrollView
       (
-        child: Form
+        child: SafeArea
         (
-          key: form,
-          autovalidateMode: AutovalidateMode.onUserInteraction,
-          child: Center
+          child: Form
           (
-            child: Column
+            key: form,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            child: Center
             (
-              children: 
-              [
-                GestureDetector
-                (
-                  onTap: SettingsLogin,
-                  child: const Row
+              child: Column
+              (
+                children: 
+                [
+                  GestureDetector
                   (
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: 
-                    [
-                      Padding
+                    onTap: SettingsLogin,
+                    child: const Row
+                    (
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: 
+                      [
+                        Padding
+                        (
+                          padding: EdgeInsets.symmetric(horizontal: 25, vertical: 5),
+                          child: Icon(Icons.settings,color: Colors.white,size: 35),
+                        ),
+                      ],
+                    ),
+                  ),
+        
+        
+                  const SizedBox(height: 20),
+        
+        
+         /* **************** L O G O : S B M  ******************* */
+        
+                  Container
+                  (
+                      width: MediaQuery.of(context).size.width-100,
+                      height: 150,
+                      decoration: BoxDecoration
                       (
-                        padding: EdgeInsets.symmetric(horizontal: 25, vertical: 5),
-                        child: Icon(Icons.settings,color: Colors.white,size: 35),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15),
                       ),
-                    ],
-                  ),
-                ),
-
-
-                const SizedBox(height: 20),
-
-
-       /* **************** L O G O : S B M  ******************* */
-
-                Container
-                (
-                    width: 300,
-                    height: 150,
-                    decoration: BoxDecoration
+        
+                    child: Center
                     (
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-
-                  child: Center
-                  (
-                    /* **************** L O G O : S B M  ******************* */
-                    child: Image.asset
-                    (
-                      'images/logo_sheidt.png',
-                      height: 200,
-                      width: 200,
+                      /* **************** L O G O : S B M  ******************* */
+                      child: Image.asset
+                      (
+                        'images/logo_sheidt.png',
+                        height: 200,
+                        width: 200,
+                      ),
                     ),
                   ),
-                ),
-
-                const SizedBox(height: 20),
-
-                    /* **************** T E X T : Register to Know more ******************* */
-
-                Text
-                (
-                  "Register to know more",
-                  style: TextStyle(color: Colors.white, fontSize: 20),
-                ),
-
-                const SizedBox(height: 20),
-
-                    /* **************** F I E L D : Email ******************* */
-
-                SizedBox
-                (
-                  height: 70,
-                  width: 350,
-                  child: TextFormField
+        
+                  const SizedBox(height: 20),
+        
+                      /* **************** T E X T : Register to Know more ******************* */
+        
+                  Text
                   (
-
-                    keyboardType: TextInputType.emailAddress,                    
-                    controller: emailController,
-
+                    "Register to know more",
+                    style: TextStyle(color: Colors.white, fontSize: 20),
+                  ),
+        
+                  const SizedBox(height: 20),
+        
+                      /* **************** F I E L D : Email ******************* */
+        
+                  SizedBox
+                  (
+                    height: 70,
+                    width: MediaQuery.of(context).size.width-70,
+                    child: TextFormField
+                    (
+        
+                      keyboardType: TextInputType.emailAddress,                    
+                      controller: emailController,
+        
+                        validator: (value) 
+                        {
+                          if (value?.isEmpty ?? true) 
+                          {
+                            return 'Email is required';
+                          }
+                          /*else if (!value!.contains('@')) 
+                          {
+                            return 'Invalid email format';
+                          }*/
+                          
+                          return null;
+                        },
+        
+        
+                      decoration: InputDecoration
+                      (
+                        labelText: 'Email',
+        
+                        enabledBorder: const OutlineInputBorder
+                        (
+                          borderSide: BorderSide(color: Colors.white),
+                        ),
+        
+                        focusedBorder: const OutlineInputBorder
+                        (
+                          borderSide: BorderSide(color: Colors.white),
+                        ),
+        
+                        fillColor: Colors.grey.shade200,
+                        filled: true,
+        
+                        focusedErrorBorder: const OutlineInputBorder
+                        (
+                          borderSide: BorderSide(color: Colors.red),
+                        ),
+                      ),
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 10),
+        
+          /* **************** F I E L D : Phone Number ******************* */
+        
+                  SizedBox
+                  (
+                    height: 70,
+                    width: MediaQuery.of(context).size.width-70,
+                    child: TextFormField
+                    (
+                      controller: phoneController,
+                      keyboardType: TextInputType.number,
                       validator: (value) 
                       {
                         if (value?.isEmpty ?? true) 
                         {
-                          return 'Email is required';
+                          return 'Phone Number is required';
                         }
-                        /*else if (!value!.contains('@')) 
+                        return null;
+                      },
+                      decoration: InputDecoration
+                      (
+                        labelText: 'Phone Number',
+                        enabledBorder: const OutlineInputBorder
+                        (
+                          borderSide: BorderSide(color: Colors.white),
+                        ),
+        
+                        focusedBorder: const OutlineInputBorder
+                        (
+                          borderSide: BorderSide(color: Colors.white),
+                        ),
+        
+                        fillColor: Colors.grey.shade200,
+                        filled: true,
+        
+                        hintStyle: TextStyle(color: Colors.grey[500]),
+                      ),
+                    ),
+                  ),
+        
+                  const SizedBox(height: 10),
+        
+            /* **************** F I E L D : Password ******************* */
+        
+                  SizedBox
+                  (
+                    height: 70,
+                    width: MediaQuery.of(context).size.width-70,
+                    child: TextFormField
+                    (
+                      controller: passwordController,
+                      obscureText: isObscureP,
+        
+                      validator: (value) 
+                      {
+                        if (value?.isEmpty ?? true) 
                         {
-                          return 'Invalid email format';
-                        }*/
+                          return 'Password is required';
+                        }
+        
+                        else if (value!.length < 8) 
+                        {
+                          return 'Password must be at least 8 characters long';
+                        }
                         
                         return null;
                       },
-
-
-                    decoration: InputDecoration
-                    (
-                      labelText: 'Email',
-
-                      enabledBorder: const OutlineInputBorder
+                      decoration: InputDecoration
                       (
-                        borderSide: BorderSide(color: Colors.white),
-                      ),
-
-                      focusedBorder: const OutlineInputBorder
-                      (
-                        borderSide: BorderSide(color: Colors.white),
-                      ),
-
-                      fillColor: Colors.grey.shade200,
-                      filled: true,
-
-                      focusedErrorBorder: const OutlineInputBorder
-                      (
-                        borderSide: BorderSide(color: Colors.red),
+                        labelText: 'Password',
+                        enabledBorder: const OutlineInputBorder
+                        (
+                          borderSide: BorderSide(color: Colors.white),
+                        ),
+                        focusedBorder: const OutlineInputBorder
+                        (
+                          borderSide: BorderSide(color: Colors.white),
+                        ),
+        
+                        fillColor: Colors.grey.shade200,
+                        filled: true,
+        
+                        suffixIcon: IconButton
+                        (
+                          onPressed: () 
+                          {
+                            setState(() 
+                            {
+                              isObscureP = !isObscureP;
+                            });
+                          },
+        
+                     /* **************** I C O N : Show / Hide ******************* */
+        
+                          icon: Icon
+                          (
+                            isObscureP
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            color: Colors.black,
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
-                
-                const SizedBox(height: 10),
-
-        /* **************** F I E L D : Phone Number ******************* */
-
-                SizedBox
-                (
-                  height: 70,
-                  width: 350,
-                  child: TextFormField
+        
+                  const SizedBox(height: 10),
+                  
+        
+               /* **************** F I E L D : Confirm Password ******************* */
+        
+                  SizedBox
                   (
-                    controller: phoneController,
-                    keyboardType: TextInputType.number,
-                    validator: (value) 
-                    {
-                      if (value?.isEmpty ?? true) 
-                      {
-                        return 'Phone Number is required';
-                      }
-                      return null;
-                    },
-                    decoration: InputDecoration
+                    height: 70,
+                    width: MediaQuery.of(context).size.width-70,
+                    child: TextFormField
                     (
-                      labelText: 'Phone Number',
-                      enabledBorder: const OutlineInputBorder
-                      (
-                        borderSide: BorderSide(color: Colors.white),
-                      ),
-
-                      focusedBorder: const OutlineInputBorder
-                      (
-                        borderSide: BorderSide(color: Colors.white),
-                      ),
-
-                      fillColor: Colors.grey.shade200,
-                      filled: true,
-
-                      hintStyle: TextStyle(color: Colors.grey[500]),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 10),
-
-    /* **************** F I E L D : Password ******************* */
-
-                SizedBox
-                (
-                  height: 70,
-                  width: 350,
-                  child: TextFormField
-                  (
-                    controller: passwordController,
-                    obscureText: isObscureP,
-
-                    validator: (value) 
-                    {
-                      if (value?.isEmpty ?? true) 
+                      controller: confpasswordController,
+                      obscureText: isObscureCP,
+        
+                      validator: (value) 
                       {
-                        return 'Password is required';
-                      }
-
-                      else if (value!.length < 8) 
-                      {
-                        return 'Password must be at least 8 characters long';
-                      }
+                        if (value?.isEmpty ?? true) 
+                        {
+                          return 'Password is required';
+                        } 
+        
+                        else if (value != passwordController.text)
+                        {
+                          return 'Password do not match';
+                        }
+        
+                        else if (value!.length < 8) 
+                        {
+                          return 'Password must be at least 8 characters long';
+                        }
+        
+                        return null;
+                      },
+        
                       
-                      return null;
-                    },
-                    decoration: InputDecoration
-                    (
-                      labelText: 'Password',
-                      enabledBorder: const OutlineInputBorder
+                      decoration: InputDecoration
                       (
-                        borderSide: BorderSide(color: Colors.white),
-                      ),
-                      focusedBorder: const OutlineInputBorder
-                      (
-                        borderSide: BorderSide(color: Colors.white),
-                      ),
-
-                      fillColor: Colors.grey.shade200,
-                      filled: true,
-
-                      suffixIcon: IconButton
-                      (
-                        onPressed: () 
-                        {
-                          setState(() 
-                          {
-                            isObscureP = !isObscureP;
-                          });
-                        },
-
-                   /* **************** I C O N : Show / Hide ******************* */
-
-                        icon: Icon
+                        labelText: 'Confirm Password',
+                        enabledBorder: const OutlineInputBorder
                         (
-                          isObscureP
-                              ? Icons.visibility_off
-                              : Icons.visibility,
-                          color: Colors.black,
+                          borderSide: BorderSide(color: Colors.white),
+                        ),
+                        focusedBorder: const OutlineInputBorder
+                        (
+                          borderSide: BorderSide(color: Colors.white),
+                        ),
+        
+                        fillColor: Colors.grey.shade200,
+                        filled: true,
+        
+                        suffixIcon: IconButton
+                        (
+                          onPressed: () 
+                          {
+                            setState(() 
+                            {
+                              isObscureCP = !isObscureCP;
+                            });
+                          },
+        
+                 /* **************** I C O N : Show / Hide ******************* */
+        
+                          icon: Icon
+                          (
+                            isObscureCP
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            color: Colors.black,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-
-                const SizedBox(height: 10),
-                
-
-             /* **************** F I E L D : Confirm Password ******************* */
-
-                SizedBox
-                (
-                  height: 70,
-                  width: 350,
-                  child: TextFormField
+        
+                  const SizedBox(height: 30),
+                  
+        /* **************** R E G I S T E R  B U T T O N ******************* */
+        
+                  MyButton
                   (
-                    controller: confpasswordController,
-                    obscureText: isObscureCP,
-
-                    validator: (value) 
-                    {
-                      if (value?.isEmpty ?? true) 
-                      {
-                        return 'Password is required';
-                      } 
-
-                      else if (value != passwordController.text)
-                      {
-                        return 'Password do not match';
-                      }
-
-                      else if (value!.length < 8) 
-                      {
-                        return 'Password must be at least 8 characters long';
-                      }
-
-                      return null;
-                    },
-
-                    
-                    decoration: InputDecoration
+                    onTap: signUserUp,
+                    textButton: 'R  E  G  I  S  T  E  R ',
+                    hb: 50,
+                    wb: MediaQuery.of(context).size.width,
+                  ),
+        
+                  const SizedBox(height: 15),
+        
+          /* **************** O R  B L O C K  ******************* */
+        
+                  Padding
+                  (
+                    padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                    child: Row
                     (
-                      labelText: 'Confirm Password',
-                      enabledBorder: const OutlineInputBorder
-                      (
-                        borderSide: BorderSide(color: Colors.white),
-                      ),
-                      focusedBorder: const OutlineInputBorder
-                      (
-                        borderSide: BorderSide(color: Colors.white),
-                      ),
-
-                      fillColor: Colors.grey.shade200,
-                      filled: true,
-
-                      suffixIcon: IconButton
-                      (
-                        onPressed: () 
-                        {
-                          setState(() 
-                          {
-                            isObscureCP = !isObscureCP;
-                          });
-                        },
-
-               /* **************** I C O N : Show / Hide ******************* */
-
-                        icon: Icon
+                      children: 
+                      [
+                        Expanded
                         (
-                          isObscureCP
-                              ? Icons.visibility_off
-                              : Icons.visibility,
-                          color: Colors.black,
+                          child: Divider
+                          (
+                            thickness: 0.5,
+                            color: Colors.grey[700],
+                          ),
                         ),
-                      ),
+                        const Padding
+                        (
+                          padding: EdgeInsets.symmetric(horizontal: 10.0),
+                          child: Text
+                          (
+                            'Or ',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                        Expanded
+                        (
+                          child: Divider
+                          (
+                            thickness: 0.5,
+                            color: Colors.grey[700],
+                          ),
+                        )
+                      ],
                     ),
                   ),
-                ),
-
-                const SizedBox(height: 30),
-                
-      /* **************** R E G I S T E R  B U T T O N ******************* */
-
-                MyButton
-                (
-                  onTap: signUserUp,
-                  textButton: 'R  E  G  I  S  T  E  R ',
-                  hb: 50,
-                  wb: 350,
-                ),
-
-                const SizedBox(height: 15),
-
-        /* **************** O R  B L O C K  ******************* */
-
-                Padding
-                (
-                  padding: const EdgeInsets.symmetric(horizontal: 30.0),
-                  child: Row
+        
+                  const SizedBox(height: 15),
+        
+            /* **************** L O G I N  B U T T O N ******************* */
+        
+                  MyButton
                   (
-                    children: 
-                    [
-                      Expanded
-                      (
-                        child: Divider
-                        (
-                          thickness: 0.5,
-                          color: Colors.grey[700],
-                        ),
-                      ),
-                      const Padding
-                      (
-                        padding: EdgeInsets.symmetric(horizontal: 10.0),
-                        child: Text
-                        (
-                          'Or ',
-                          style: TextStyle(color: Colors.black),
-                        ),
-                      ),
-                      Expanded
-                      (
-                        child: Divider
-                        (
-                          thickness: 0.5,
-                          color: Colors.grey[700],
-                        ),
-                      )
-                    ],
+                    onTap: signUserIn,
+                    textButton: 'L  O  G  I  N ',
+                    hb: 50,
+                    wb: MediaQuery.of(context).size.width,
                   ),
-                ),
-
-                const SizedBox(height: 15),
-
-          /* **************** L O G I N  B U T T O N ******************* */
-
-                MyButton
-                (
-                  onTap: signUserIn,
-                  textButton: 'L  O  G  I  N ',
-                  hb: 50,
-                  wb: 350,
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

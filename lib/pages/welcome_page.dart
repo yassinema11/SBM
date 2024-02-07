@@ -22,9 +22,9 @@ class WelcomePageState extends State<WelcomePage>
 {
     final items = const 
     [
-      Icon(Icons.person, size: 30,),
-      Icon(Icons.home, size: 30,),
-      Icon(Icons.settings, size: 30,),
+      Icon(Icons.person, size: 30),
+      Icon(Icons.home, size: 30),
+      Icon(Icons.settings, size: 30),
     ];
 
     int index = 1;
@@ -369,8 +369,6 @@ class WelcomePageState extends State<WelcomePage>
             ),
           ),*/
 
-
-    
     /* **************** C O N T A I N E R : HOME PAGE ******************* 
           Container
           (
@@ -646,7 +644,6 @@ class WelcomePageState extends State<WelcomePage>
             ),
           ),*/
     
-
     /* **************** C O N T A I N E R : SETTINGS PAGE ******************* 
 
           Container
@@ -671,7 +668,6 @@ class WelcomePageState extends State<WelcomePage>
           ),*/
         
       
-
         /*onPageChanged: (int index) 
         {
           setState(() 
@@ -679,7 +675,6 @@ class WelcomePageState extends State<WelcomePage>
             currentIndex = index;
           });
         },*/
-      
     
     );
   } 

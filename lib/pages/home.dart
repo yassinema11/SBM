@@ -31,14 +31,12 @@ class HomeState extends State<Home>
   {
     try 
     {
-      // Check if Bluetooth is supported
       if (!(await FlutterBluePlus.isAvailable)) 
       {
         print("Bluetooth is not available on this device");
         return;
       }
 
-      // Check if Bluetooth is turned on
       if (!(await FlutterBluePlus.isOn)) 
       {
         print("Bluetooth is not turned on");
@@ -58,14 +56,12 @@ class HomeState extends State<Home>
 
   Future<void> OpenGate() async 
   {
-    // Generate your custom signal data (replace with your data)
     final customSignalData = [0x00, 0x00, 0x00, 0x00];
 
-    // Create an Eddystone UID frame with your custom signal data
     final eddystoneFrame = EddystoneUidFrame
     (
       namespaceId: [0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF], 
-      instanceId: customSignalData, // Use your custom signal data as the instance ID
+      instanceId: customSignalData,
     );
 
     print('BLE Signal Sent Successfully');
@@ -106,7 +102,8 @@ class HomeState extends State<Home>
             (
               width: 350,
               height: 60,
-              decoration: BoxDecoration(
+              decoration: BoxDecoration
+              (
                 color: const Color(0xFFA367B1),
                 borderRadius: BorderRadius.circular(20),
               ),
@@ -200,7 +197,9 @@ class HomeState extends State<Home>
               height: 200,
             ),
           ),
+
           const SizedBox(height: 50),
+
           Center
           (
             child: GestureDetector
@@ -216,7 +215,8 @@ class HomeState extends State<Home>
                   gradient: const RadialGradient
                   (
                     radius: 1,
-                    colors: <Color>[
+                    colors: <Color>
+                    [
                       Color.fromARGB(255, 149, 97, 202),
                       Color(0xFF810cf5),
                       Color(0xFFa64efc),
@@ -258,7 +258,7 @@ class EddystoneUidFrame
   List<int> get frameBytes 
   {
     final byteList = Uint8List(18);
-    byteList[0] = 0x00; // Frame type
+    byteList[0] = 0x00;  
     byteList.setAll(1, namespaceId);
     byteList.setAll(11, instanceId);
     return byteList;
