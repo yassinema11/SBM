@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget
     return MaterialApp
     (
       debugShowCheckedModeBanner: false,
-      home: const WelcomePage(),
+      home: const LoginPage(),
 
       theme: ThemeData
       (

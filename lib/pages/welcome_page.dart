@@ -1,7 +1,8 @@
-// ignore_for_file: avoid_unnecessary_containers, non_constant_identifier_names, prefer_const_constructors, prefer_const_literals_to_create_immutables, avoid_print, sized_box_for_whitespace, unused_element, use_build_context_synchronously, unused_local_variable, unused_import, unnecessary_null_comparison
+// ignore_for_file: avoid_unnecessary_containers, non_constant_identifier_names, prefer_const_constructors, prefer_const_literals_to_create_immutables, avoid_print, sized_box_for_whitespace, unused_element, use_build_context_synchronously, unused_local_variable, unused_import, unnecessary_null_comparison, unused_label
 
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
+//import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -40,6 +41,8 @@ class WelcomePageState extends State<WelcomePage>
   @override
   Widget build(BuildContext context) 
   {
+        statusBarColor: Colors.white;
+
     return Scaffold
     (
       bottomNavigationBar: CurvedNavigationBar

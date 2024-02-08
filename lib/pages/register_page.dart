@@ -179,7 +179,7 @@ void signUserUp() async
       (
         {
           'email': userEmail,
-          'password': passwordCrypted,
+          'password': userPassword,
           'phone': userPhoneNumber,
         } 
       ),

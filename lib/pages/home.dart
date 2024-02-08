@@ -1,10 +1,16 @@
-// ignore_for_file: avoid_print, unused_local_variable, non_constant_identifier_names, deprecated_member_use, unused_import, file_names
+// ignore_for_file: avoid_print, unused_local_variable, non_constant_identifier_names, deprecated_member_use, unused_import, file_names, avoid_unnecessary_containers, use_build_context_synchronously
 
+import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:flutter_blue/flutter_blue.dart';
+//import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:beacon_broadcast/beacon_broadcast.dart';
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Home extends StatefulWidget 
 {
@@ -17,10 +23,11 @@ class Home extends StatefulWidget
 class HomeState extends State<Home> 
 {
   bool isScanning = false;
-  BluetoothDevice? connectedDevice;
   late String Blt;
   bool isBluetoothConnected = false;
   BeaconBroadcast beaconBroadcast = BeaconBroadcast();
+
+
 
   @override
   void initState() 
@@ -56,27 +63,86 @@ class HomeState extends State<Home>
     }
   }
 
-  Future<void> OpenGate() async 
-  {
+  Future<void> openGate() async 
+  { 
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? uid = prefs.getString('id');
 
-    beaconBroadcast
-    .setUUID('39ED98FF-2900-441A-802F-9C398FC199D2')
-    .setMajorId(1)
-    .setMinorId(100)
-    .start();
+    if (!isBluetoothConnected) 
+    {
+      // Display an alert to turn on Bluetooth
+      await showDialog
+      (
+        context: context,
+        builder: (BuildContext context) 
+        {
+          return AlertDialog
+          (
+            backgroundColor: Colors.black,
+            title: const Text('Bluetooth OFF', style: TextStyle(color: Colors.white)),
+            content: const Text('Turn it ON?', style: TextStyle(color: Colors.white)),
+            actions: 
+            [
+              TextButton
+              (
+                onPressed: () 
+                {
+                  Navigator.of(context).pop();
+                },
+              
+                child: const Text('No', style: TextStyle(color: Colors.white)),
+              ),
+
+              TextButton
+              (
+                onPressed: () async 
+                {
+                  // Close the alert dialog
+                  Navigator.of(context).pop();
+                  // Turn on Bluetooth
+                  //await FlutterBlue.instance.isOn;
+                },
+                child: const Text('Yes', style: TextStyle(color: Colors.white)),
+              ),
+            ],
+          );
+        },
+      );
+    }
+    else
+    {
+      try 
+      {
+
+        print('BLE Broadcasting...');
+        String cid = 'SBM'; // Company ID
+        String? Uid = uid;  // user ID from the database 
 
 
-    /*
-    final customSignalData = [0x00, 0x00, 0x00, 0x00];
+        // Start broadcasting the beacon signal
+        await beaconBroadcast
+            .setUUID('$cid-$Uid-441A-802F-9C398FC199D2')
+            .setMajorId(1)
+            .setMinorId(100)
+            .start();
+        
+        print('BLE Signal Sent Successfully with the user id --- $uid');
+      } 
+      catch (e) 
+      {
+        print('Error Broadcasting BLE Signal: $e');
+      }
 
-    final eddystoneFrame = EddystoneUidFrame
-    (
-      namespaceId: [0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF], 
-      instanceId: customSignalData,
-    );
-    */
+        /*
+          final customSignalData = [0x00, 0x00, 0x00, 0x00];
 
-    print('BLE Signal Sent Successfully');
+          final eddystoneFrame = EddystoneUidFrame
+          (
+            namespaceId: [0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF], 
+            instanceId: customSignalData,
+          );
+        */
+    }
   }
 
   @override
@@ -216,7 +282,7 @@ class HomeState extends State<Home>
           (
             child: GestureDetector
             (
-              onTap: OpenGate,
+              onTap: openGate,
               child: Container
               (
                 width: 200,
@@ -228,10 +294,28 @@ class HomeState extends State<Home>
                   (
                     radius: 1,
                     colors: <Color>
-                    [
-                      Color.fromARGB(255, 149, 97, 202),
-                      Color(0xFF810cf5),
-                      Color(0xFFa64efc),
+                    [                      
+                      Colors.transparent,
+                      Colors.transparent,
+                      Colors.transparent,
+                      Colors.transparent,
+                      Colors.transparent,
+                      Colors.transparent,
+                      Colors.transparent,
+                      Colors.transparent,
+                      Colors.transparent,
+                      Colors.transparent,
+                      Colors.transparent,
+                      Colors.transparent,
+                      Colors.transparent,
+                      Colors.transparent,
+                      Colors.transparent,
+                      Colors.transparent,
+                      Color(0xFF810cf5),                                     
+                      Color.fromARGB(255, 149, 97, 202),                      
+                      Colors.transparent,
+                      Color.fromARGB(255, 149, 97, 202), 
+                      Colors.transparent,
                     ],
                   ),
                   borderRadius: BorderRadius.circular(20),

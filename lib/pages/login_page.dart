@@ -87,14 +87,13 @@ class LoginPageState extends State<LoginPage>
     return md5.convert(utf8.encode(input)).toString();
   }
 
-
-  void saveUserData(String userEmail, String userPass) async 
+  void saveUserData(String userEmail, String userPass, String Id) async 
   {
     SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.setString('id', Id);
     pref.setString('user', userEmail);
     pref.setString('password', userPass);
   }
-
   
  /* **************** L O G I N  F U N C T I O N ******************* */
 
@@ -102,6 +101,7 @@ class LoginPageState extends State<LoginPage>
  {
   String userEmail = emailController.text;
   String userPassword = passwordController.text;
+  String userID='0';
 
 
   if(userEmail.isEmpty && userPassword.isEmpty)
@@ -146,15 +146,28 @@ class LoginPageState extends State<LoginPage>
         body: jsonEncode
         (
           {
+            '_id': userID,
             'email': userEmail, 
-            'password': passwordCrypted,
+            'password': userPassword,
           },
         ),
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) 
       {
-        saveUserData(userEmail,passwordCrypted);
+        var responseData = jsonDecode(response.body);
+  
+        // Extract the user ID from the response
+        var userId = responseData['userId'];
+        userID = userId;
+        
+        // Print the user ID in the debugger
+        print('User ID: $userID');
+
+        print('------------------------');
+
+        saveUserData(userEmail,passwordCrypted,userID);
+        print('id $userID');
 
         QuickAlert.show
         (
@@ -207,7 +220,6 @@ class LoginPageState extends State<LoginPage>
   }
 
 
-
   /* **************** R E G I S T E R  F U N C T I O N ******************* */
   void signUserUp() 
   {
@@ -258,7 +270,7 @@ class LoginPageState extends State<LoginPage>
                 style: TextStyle(color: Colors.white)
               ),
 
-        const SizedBox(height: 15),
+            const SizedBox(height: 15),
 
               Container
               (
@@ -351,7 +363,7 @@ class LoginPageState extends State<LoginPage>
       backgroundColor: const Color(0xFF080a16),
 
 
-       /* **************** B O D Y  ******************* */
+      /* **************** B O D Y  ******************* */
       body: SingleChildScrollView
       (
         child: SafeArea
@@ -371,7 +383,7 @@ class LoginPageState extends State<LoginPage>
                   (
                     onTap: SettingsLogin,
                     child: const Row
-                    (
+                      (
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: 
                       [
@@ -408,9 +420,9 @@ class LoginPageState extends State<LoginPage>
                     ),
                   ),
         
-        const SizedBox(height: 40), 
+                const SizedBox(height: 40),
                   
-          /* **************** T E X T : WELCOME BACK ******************* */
+                  /* **************** T E X T : WELCOME BACK ******************* */
         
                   const Text
                   (
@@ -421,7 +433,7 @@ class LoginPageState extends State<LoginPage>
                   const SizedBox(height: 20),
         
         
-          /* **************** F I E L D : EMAIL ******************* */
+                /* **************** F I E L D : EMAIL ******************* */
                   SizedBox
                   (
                     height: 70,
@@ -584,16 +596,15 @@ class LoginPageState extends State<LoginPage>
                     ],
                   ),
         
-        
-            //bgColor: 0xFF080a16
-            //btn : 
-            //      1/ 0xFF810cf5 *** 2/ 0xFF810cf5 *** 3/ 0xFFa64efc 
-        
-            // box : 0xFF141931
+                    //bgColor: 0xFF080a16
+                    //btn :
+                    //      1/ 0xFF810cf5 *** 2/ 0xFF810cf5 *** 3/ 0xFFa64efc
+
+                    // box : 0xFF141931
             
                   const SizedBox(height: 25),
                   
-          /* **************** L O G I N  B U T T O N  ******************* */
+                  /* **************** L O G I N  B U T T O N  ******************* */
                   MyButton
                   (
                     onTap: signUserIn,
@@ -605,7 +616,7 @@ class LoginPageState extends State<LoginPage>
                   const SizedBox(height: 15),
                   
         
-          /* **************** O R  B L O C K  ******************* */
+                  /* **************** O R  B L O C K  ******************* */
         
                   Padding
                   (
@@ -653,7 +664,7 @@ class LoginPageState extends State<LoginPage>
         
                   const SizedBox(height: 15),
         
-          /* **************** R E G I S T E R   B U T T O N ******************* */
+                  /* **************** R E G I S T E R   B U T T O N ******************* */
         
                   MyButton
                   (

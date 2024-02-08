@@ -408,6 +408,7 @@ class ProfileState extends State<Profile>
   {
     return Scaffold
     (
+      
       resizeToAvoidBottomInset: false,
       backgroundColor: Color(0xFF080a16),
 
