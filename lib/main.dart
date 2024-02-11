@@ -47,6 +47,7 @@ class MyApp extends StatelessWidget
         '/home': (context) => const Home(),
         '/settings': (context) => const Settings(),
       },
+
     );
   }
 }

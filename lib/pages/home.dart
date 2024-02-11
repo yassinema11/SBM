@@ -120,7 +120,7 @@ class HomeState extends State<Home>
 
 
         // Start broadcasting the beacon signal
-        await beaconBroadcast
+          await beaconBroadcast
             .setUUID('$cid-$Uid-441A-802F-9C398FC199D2')
             .setMajorId(1)
             .setMinorId(100)
@@ -131,7 +131,7 @@ class HomeState extends State<Home>
       catch (e) 
       {
         print('Error Broadcasting BLE Signal: $e');
-      }
+      } 
 
         /*
           final customSignalData = [0x00, 0x00, 0x00, 0x00];
@@ -143,7 +143,7 @@ class HomeState extends State<Home>
           );
         */
     }
-  }
+  } 
 
   @override
   Widget build(BuildContext context) 

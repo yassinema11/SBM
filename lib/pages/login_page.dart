@@ -346,6 +346,10 @@ class LoginPageState extends State<LoginPage>
   @override
   Widget build(BuildContext context) 
   {
+    var screenHeight = MediaQuery.of(context).size.height;
+    var screenWidth = MediaQuery.of(context).size.width;
+
+
     Map<String, dynamic>? arguments = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
 
     if (arguments != null && arguments.containsKey('email')) 
@@ -362,6 +366,7 @@ class LoginPageState extends State<LoginPage>
       resizeToAvoidBottomInset: true, 
       backgroundColor: const Color(0xFF080a16),
 
+      
 
       /* **************** B O D Y  ******************* */
       body: SingleChildScrollView
