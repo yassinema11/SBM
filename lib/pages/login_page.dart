@@ -87,12 +87,12 @@ class LoginPageState extends State<LoginPage>
     return md5.convert(utf8.encode(input)).toString();
   }
 
-  void saveUserData(String userEmail, String userPass, String Id) async 
+  void saveUserData(String userEmail, String userPass, String uidu) async 
   {
     SharedPreferences pref = await SharedPreferences.getInstance();
-    pref.setString('id', Id);
     pref.setString('user', userEmail);
     pref.setString('password', userPass);
+    pref.setString('ui', uidu);
   }
   
  /* **************** L O G I N  F U N C T I O N ******************* */
@@ -101,7 +101,9 @@ class LoginPageState extends State<LoginPage>
  {
   String userEmail = emailController.text;
   String userPassword = passwordController.text;
-  String userID='0';
+  String userID = '0';
+  String UserId = 'aaa';
+
 
 
   if(userEmail.isEmpty && userPassword.isEmpty)
@@ -157,17 +159,15 @@ class LoginPageState extends State<LoginPage>
       {
         var responseData = jsonDecode(response.body);
   
-        // Extract the user ID from the response
-        var userId = responseData['userId'];
-        userID = userId;
-        
-        // Print the user ID in the debugger
+        UserId = responseData['userId'];
+
         print('User ID: $userID');
+        print(userID.runtimeType);
 
         print('------------------------');
 
-        saveUserData(userEmail,passwordCrypted,userID);
-        print('id $userID');
+        saveUserData(userEmail,passwordCrypted,UserId);
+        print('id:  $userID');
 
         QuickAlert.show
         (

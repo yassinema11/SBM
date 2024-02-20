@@ -27,14 +27,29 @@ class ProfileState extends State<Profile>
   late String phone = "Phone";
   late String curpas = "Current Password";
   late String newpas = "New Password";
-
   late List<Map<String, dynamic>> lpns = [];
+  String selectedLanguage = 'English';
+  bool isDarkMode = true;
+
   
   @override
   void initState() 
   {
     super.initState();
     ProfileData();
+    loadSet();
+  }
+
+  Future<void> loadSet() async 
+  {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    setState(() 
+    {
+      selectedLanguage = prefs.getString('language')?? 'English';
+      print(isDarkMode);
+      isDarkMode = prefs.getBool('darkMode')?? true;
+    });
   }
   
   void Logout() async 
@@ -216,7 +231,7 @@ class ProfileState extends State<Profile>
                   ),
                 ),
 
-                        const SizedBox(height: 15),
+            const SizedBox(height: 15),
 
                 Container
                 (
@@ -241,7 +256,7 @@ class ProfileState extends State<Profile>
                   ),
                 ),
 
-                        const SizedBox(height: 15),
+     const SizedBox(height: 15),
 
                 Container
                 (
@@ -265,7 +280,7 @@ class ProfileState extends State<Profile>
                   ),
                 ),
 
-        const SizedBox(height: 15),
+      const SizedBox(height: 15),
 
                 Container
                 (
@@ -289,7 +304,7 @@ class ProfileState extends State<Profile>
                   ),
                 ),
 
-             const SizedBox(height: 15),
+        const SizedBox(height: 15),
 
                 Container
                 (
@@ -410,31 +425,31 @@ class ProfileState extends State<Profile>
     (
       
       resizeToAvoidBottomInset: false,
-      backgroundColor: Color(0xFF080a16),
+      backgroundColor: isDarkMode ? Color(0xFF080a16) : Colors.white,
 
       body: Column
       (
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: 
-                [
-                  AppBar
-                  (
-                    automaticallyImplyLeading: false,
-                    title: const Text
-                    (
-                        "Profile",
-                          style: TextStyle
-                          (
-                            fontWeight: FontWeight.bold,
-                            fontSize: 25,
-                            color: Colors.white,
-                          ),
-                        ),
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: 
+        [
+          AppBar
+          (
+            automaticallyImplyLeading: false,
+            title: Text
+            (
+              "Profile",
+              style: TextStyle
+              (
+                fontWeight: FontWeight.bold,
+                fontSize: 25,
+                color: isDarkMode ? Colors.white : Colors.black,
+              ),
+           ),
                         
-                        backgroundColor: Color(0xFF080a16),
-                        centerTitle: true,
-                        actions: 
-                        [
+            backgroundColor: isDarkMode ? Color(0xFF080a16) : Colors.white,
+             centerTitle: true,
+              actions: 
+              [
                            Padding
                            (
                              padding: const EdgeInsets.symmetric(horizontal: 15.0),
@@ -443,7 +458,7 @@ class ProfileState extends State<Profile>
                                 icon: Icon
                                 (
                                   Icons.edit,
-                                  color: Colors.white,
+                                  color: isDarkMode ? Colors.white : Colors.black,
                                   size: 30,
                                 ),
                                 tooltip: 'Edit Profile',
@@ -490,7 +505,7 @@ class ProfileState extends State<Profile>
                       height: 40,
                       decoration: BoxDecoration
                       (
-                        color: Colors.white,
+                         color: isDarkMode ? Colors.white : Colors.black,
                         borderRadius: BorderRadius.circular(15),
                       ),
                   
@@ -504,7 +519,10 @@ class ProfileState extends State<Profile>
                           Padding
                           (
                             padding: EdgeInsets.zero,
-                            child: Icon(Icons.person, color: Color(0xFF5e3b91),),
+                            child: Icon
+                            (
+                              Icons.person, color: isDarkMode ? Color(0xFF5e3b91): Color.fromARGB(255, 213, 190, 252),
+                            ),
                           ),
                         
                               SizedBox(width:15),
@@ -517,7 +535,7 @@ class ProfileState extends State<Profile>
                                 name,
                                 style: TextStyle
                                 (
-                                  color: Colors.black,
+                                  color: isDarkMode ? Colors.black : Colors.white,
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -538,7 +556,7 @@ class ProfileState extends State<Profile>
                       height: 40,
                       decoration: BoxDecoration
                       (
-                        color: Colors.white,
+                         color: isDarkMode ? Colors.white : Colors.black,
                         borderRadius: BorderRadius.circular(20),
                       ),
                   
@@ -549,7 +567,7 @@ class ProfileState extends State<Profile>
                         [
                           SizedBox(width:15),
                         
-                          Icon(Icons.mail, color: Color(0xFF5e3b91),),
+                          Icon(Icons.mail, color: isDarkMode ? Color(0xFF5e3b91): Color.fromARGB(255, 213, 190, 252)),
                   
                           SizedBox(width:15),
                   
@@ -558,7 +576,7 @@ class ProfileState extends State<Profile>
                             mail,
                             style: TextStyle
                             (
-                              color: Colors.black,
+                              color: isDarkMode ? Colors.black : Colors.white,
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
                             ),
@@ -578,7 +596,7 @@ class ProfileState extends State<Profile>
                       height: 40,
                       decoration: BoxDecoration
                       (
-                        color: Colors.white,
+                         color: isDarkMode ? Colors.white : Colors.black,
                         borderRadius: BorderRadius.circular(20),
                       ),
                   
@@ -589,7 +607,7 @@ class ProfileState extends State<Profile>
                         [
                           SizedBox(width:15),
                         
-                          Icon(Icons.phone, color: Color(0xFF5e3b91),),
+                          Icon(Icons.phone,color: isDarkMode ? Color(0xFF5e3b91) : Color.fromARGB(255, 213, 190, 252) ),
                   
                           SizedBox(width:15),
                   
@@ -598,7 +616,7 @@ class ProfileState extends State<Profile>
                             phone,
                             style: TextStyle
                             (
-                              color: Colors.black,
+                              color: isDarkMode ? Colors.black : Colors.white,
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
                             ),

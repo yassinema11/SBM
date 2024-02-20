@@ -2,7 +2,6 @@
 
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
-//import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -21,27 +20,44 @@ class WelcomePage extends StatefulWidget
 
 class WelcomePageState extends State<WelcomePage> 
 {
-    final items = const 
+    final items = 
     [
-      Icon(Icons.person, size: 30),
-      Icon(Icons.home, size: 30),
-      Icon(Icons.settings, size: 30),
+      Icon(Icons.person, size: 25),
+      Icon(Icons.home, size: 25),
+      Icon(Icons.settings, size: 25),
+      Icon(Icons.maps_ugc_sharp, size: 25),
     ];
 
     int index = 1;
+    String selectedLanguage = 'English';
+    
+    bool isDarkMode = true;
 
-    @override
+  Future<void> loadSet() async 
+  {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    setState(() 
+    {
+      selectedLanguage = prefs.getString('language')?? 'English';
+      print(isDarkMode);
+      isDarkMode = prefs.getBool('darkMode')?? true;
+    });
+  }
+
+
+  @override
   void initState() 
   {
     super.initState();
+    super.activate();
+    loadSet();
   }
- 
- 
+
   
   @override
   Widget build(BuildContext context) 
   {
-        statusBarColor: Colors.white;
 
     return Scaffold
     (
@@ -50,8 +66,7 @@ class WelcomePageState extends State<WelcomePage>
         height: 50,
         items: items,
         index: index,        
-        buttonBackgroundColor: Color(0xFFFFD1E3),
-        backgroundColor: Color(0xFF080a16),
+        backgroundColor: isDarkMode ? Colors.black : Colors.white,
 
         animationDuration: const Duration(milliseconds: 10),
         animationCurve: Curves.easeInOut,
@@ -72,7 +87,6 @@ class WelcomePageState extends State<WelcomePage>
       (
         width: double.infinity,
         height: double.infinity,
-        
         
         child: getSelectedWidget(index: index)
       ),
@@ -687,7 +701,6 @@ class WelcomePageState extends State<WelcomePage>
     Widget widget;
     switch(index)
     {
-
       case 0:
         widget = const Profile();
         break;

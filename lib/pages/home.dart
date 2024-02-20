@@ -1,11 +1,9 @@
-// ignore_for_file: avoid_print, unused_local_variable, non_constant_identifier_names, deprecated_member_use, unused_import, file_names, avoid_unnecessary_containers, use_build_context_synchronously
+// ignore_for_file: avoid_print, unused_local_variable, non_constant_identifier_names, deprecated_member_use, unused_import, file_names, avoid_unnecessary_containers, use_build_context_synchronously, unnecessary_const, prefer_const_constructors, prefer_adjacent_string_concatenation, unused_element, unnecessary_type_check, unnecessary_null_comparison
 
 import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:flutter_blue/flutter_blue.dart';
-//import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:beacon_broadcast/beacon_broadcast.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:quickalert/models/quickalert_type.dart';
@@ -26,14 +24,15 @@ class HomeState extends State<Home>
   late String Blt;
   bool isBluetoothConnected = false;
   BeaconBroadcast beaconBroadcast = BeaconBroadcast();
-
-
+  String selectedLanguage = 'English';
+  bool isDarkMode = true;
 
   @override
   void initState() 
   {
     super.initState();
     BltStat();
+    loadSet();
   }
 
   Future<void> BltStat() async 
@@ -61,89 +60,82 @@ class HomeState extends State<Home>
     {
       print("Error connecting to device: $e");
     }
-  }
-
-  Future<void> openGate() async 
-  { 
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? uid = prefs.getString('id');
-
-    if (!isBluetoothConnected) 
+  }    
+  
+    bool isValidUUID(String? uuid) 
     {
-      // Display an alert to turn on Bluetooth
-      await showDialog
+      if (uuid == null) return false;
+      final pattern = RegExp
       (
-        context: context,
-        builder: (BuildContext context) 
-        {
-          return AlertDialog
-          (
-            backgroundColor: Colors.black,
-            title: const Text('Bluetooth OFF', style: TextStyle(color: Colors.white)),
-            content: const Text('Turn it ON?', style: TextStyle(color: Colors.white)),
-            actions: 
-            [
-              TextButton
-              (
-                onPressed: () 
-                {
-                  Navigator.of(context).pop();
-                },
-              
-                child: const Text('No', style: TextStyle(color: Colors.white)),
-              ),
-
-              TextButton
-              (
-                onPressed: () async 
-                {
-                  // Close the alert dialog
-                  Navigator.of(context).pop();
-                  // Turn on Bluetooth
-                  //await FlutterBlue.instance.isOn;
-                },
-                child: const Text('Yes', style: TextStyle(color: Colors.white)),
-              ),
-            ],
-          );
-        },
-      );
+          r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',caseSensitive: false
+      );  
+      return pattern.hasMatch(uuid);
     }
-    else
+    
+  Future<void> openGate() async 
+  {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? id = prefs.getString('ui');
+
+    if (id != null) 
     {
-      try 
-      {
+      try {
+        int myInt = int.tryParse(id) ?? 0; // Provide a default value if parsing fails
+        String hexString = myInt.toRadixString(16).padLeft(8, '0'); // Pad to 8 characters with leading zeros
 
-        print('BLE Broadcasting...');
-        String cid = 'SBM'; // Company ID
-        String? Uid = uid;  // user ID from the database 
+        print('Hex String: $hexString');
 
+        String uuid = '$hexString-2900-441A-802F-9C398FC199D2';
+        print('Generated UUID: $uuid');
 
-        // Start broadcasting the beacon signal
-          await beaconBroadcast
-            .setUUID('$cid-$Uid-441A-802F-9C398FC199D2')
-            .setMajorId(1)
-            .setMinorId(100)
-            .start();
-        
-        print('BLE Signal Sent Successfully with the user id --- $uid');
+        bool isValid = isValidUUID(uuid);
+
+        if (isValid) 
+        {
+          try 
+          {
+            beaconBroadcast
+                .setUUID(uuid)
+                .setMajorId(1)
+                .setMinorId(100)
+                .start();
+
+            print('BLE Signal Sent Successfully');
+          } 
+          catch (e) 
+          {
+            print('Error Broadcasting BLE Signal: $e');
+          }
+        } 
+        else 
+        {
+          print('Invalid UUID: $uuid');
+        }
       } 
       catch (e) 
       {
-        print('Error Broadcasting BLE Signal: $e');
-      } 
-
-        /*
-          final customSignalData = [0x00, 0x00, 0x00, 0x00];
-
-          final eddystoneFrame = EddystoneUidFrame
-          (
-            namespaceId: [0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF], 
-            instanceId: customSignalData,
-          );
-        */
+        print('Error: $e');
+      }
+    } 
+    else 
+    {
+      print('ID not found in SharedPreferences');
     }
-  } 
+  }
+
+
+  Future<void> loadSet() async 
+  {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    setState(()
+    {
+      selectedLanguage = prefs.getString('language')?? 'English';
+      print(isDarkMode);
+      isDarkMode = prefs.getBool('darkMode')?? true;
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) 
@@ -151,7 +143,8 @@ class HomeState extends State<Home>
     return Scaffold
     (
       resizeToAvoidBottomInset: false,
-      backgroundColor: const Color(0xFF080a16),
+      backgroundColor: isDarkMode ? const Color(0xFF080a16) : Colors.white,
+      
       body: Column
       (
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -160,25 +153,28 @@ class HomeState extends State<Home>
           AppBar
           (
             automaticallyImplyLeading: false,
-            title: const Text
+            title: Text
             (
               "Welcome",
+
               style: TextStyle
               (
                 fontWeight: FontWeight.bold,
                 fontSize: 25,
-                color: Colors.white,
+                color: isDarkMode? Colors.white : Colors.black,
               ),
             ),
-            backgroundColor: const Color(0xFF080a16),
+              backgroundColor: isDarkMode ? const Color(0xFF080a16) : Colors.white,
             centerTitle: true,
           ),
+
           const SizedBox(height: 20),
+
           Center
           (
             child: Container
             (
-              width: 350,
+              width: 300,
               height: 60,
               decoration: BoxDecoration
               (
@@ -204,8 +200,11 @@ class HomeState extends State<Home>
                       ),
                     ),
                   ),
-                  SizedBox(width: 150),
-                  Text(
+
+                  SizedBox(width: 100),
+
+                  Text
+                  (
                     '00',
                     style: TextStyle
                     (
@@ -219,7 +218,7 @@ class HomeState extends State<Home>
             ),
           ),
 
-          const SizedBox(height: 40),
+        const SizedBox(height: 40),
 
           Row
           (
@@ -235,16 +234,16 @@ class HomeState extends State<Home>
                   height: 25,
                 ),
               ),
-              const Padding
+              Padding
               (
-                padding: EdgeInsets.all(10.0),
+                padding: const EdgeInsets.all(10.0),
                 child: Text
                 (
                   'Bluetooth :',
                   style: TextStyle
                   (
-                    color: Colors.white,
                     fontSize: 22,
+                    color: isDarkMode ? Colors.white : Colors.black,          
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -270,7 +269,7 @@ class HomeState extends State<Home>
           (
             child: Image.asset
             (
-              'images/main.png',
+              isDarkMode ? 'images/main.png' : 'images/main_img.png',
               width: 200,
               height: 200,
             ),
@@ -290,45 +289,36 @@ class HomeState extends State<Home>
                 alignment: Alignment.center,
                 decoration: BoxDecoration
                 (
-                  gradient: const RadialGradient
+                  gradient: RadialGradient
                   (
                     radius: 1,
-                    colors: <Color>
-                    [                      
-                      Colors.transparent,
-                      Colors.transparent,
-                      Colors.transparent,
-                      Colors.transparent,
-                      Colors.transparent,
-                      Colors.transparent,
-                      Colors.transparent,
-                      Colors.transparent,
-                      Colors.transparent,
-                      Colors.transparent,
-                      Colors.transparent,
-                      Colors.transparent,
-                      Colors.transparent,
-                      Colors.transparent,
-                      Colors.transparent,
-                      Colors.transparent,
-                      Color(0xFF810cf5),                                     
-                      Color.fromARGB(255, 149, 97, 202),                      
-                      Colors.transparent,
-                      Color.fromARGB(255, 149, 97, 202), 
-                      Colors.transparent,
-                    ],
+                    colors: isDarkMode
+                    ? [
+                        Colors.transparent,
+                        Colors.transparent,
+                        Colors.transparent,
+                        Colors.transparent,
+                        Color(0xFF810cf5),
+                      ]
+                    : [
+                        Colors.transparent,
+                        Colors.transparent,
+                        Colors.transparent,
+                        Colors.transparent,
+                        Color(0xFF810cf5),
+                      ],
                   ),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: const Padding
+                child: Padding
                 (
-                  padding: EdgeInsets.all(15.0),
+                  padding: const EdgeInsets.all(15.0),
                   child: Text
                   (
                     'Click to OPEN',
                     style: TextStyle
                     (
-                      color: Colors.white,
+                      color: isDarkMode ? Colors.white : Colors.black,          
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                     ),
@@ -341,22 +331,5 @@ class HomeState extends State<Home>
         ],
       ),
     );
-  }
-}
-
-class EddystoneUidFrame 
-{
-  final List<int> namespaceId;
-  final List<int> instanceId;
-
-  EddystoneUidFrame({required this.namespaceId, required this.instanceId});
-
-  List<int> get frameBytes 
-  {
-    final byteList = Uint8List(18);
-    byteList[0] = 0x00;  
-    byteList.setAll(1, namespaceId);
-    byteList.setAll(11, instanceId);
-    return byteList;
   }
 }

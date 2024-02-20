@@ -4,6 +4,7 @@ class SquareTile extends StatelessWidget
 {
   final String imagePath;
   final double height,width;
+  
   const SquareTile
   (
     {
