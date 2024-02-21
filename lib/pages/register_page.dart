@@ -196,7 +196,7 @@ void signUserUp() async
         text: 'Registered Successfully!',
         showConfirmBtn:false,	
       );
-      // Adding a delay of 2 seconds before navigating to the login page
+
       Future.delayed(Duration(seconds: 3), () 
       {
         Navigator.pushNamed

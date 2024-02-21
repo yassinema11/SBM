@@ -19,8 +19,8 @@ class LoginPage extends StatefulWidget
 class LoginPageState extends State<LoginPage> 
 {
   final GlobalKey<FormState> form = GlobalKey<FormState>();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
 
   TextEditingController serverController = TextEditingController();
   TextEditingController portController = TextEditingController();
@@ -37,26 +37,28 @@ class LoginPageState extends State<LoginPage>
   }
 
     /* **************** Check and SignIN  F U N C T I O N ******************* */
-  Future<void> checkAndSignIn() 
-  async 
-  {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool hasSavedCredentials = prefs.getBool('rememberUser') ?? false;
-
-    if (hasSavedCredentials) 
+    Future<void> checkAndSignIn() async 
     {
-      String userEmail = prefs.getString('userEmail') ?? '';
-      String userPassword = prefs.getString('userPassword') ?? '';
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      bool hasSavedCredentials = prefs.getBool('rememberUser') ?? false;
 
-      if (userEmail.isNotEmpty && userPassword.isNotEmpty) 
+      if (hasSavedCredentials) 
       {
-        emailController.text = userEmail;
-        passwordController.text = userPassword;
+        String userEmail = prefs.getString('userEmail') ?? '';
+        String userPassword = prefs.getString('userPassword') ?? '';
+        print("$userEmail ------ $userPassword");
 
-        signUserIn();
+        if (userEmail.isNotEmpty && userPassword.isNotEmpty) 
+        {
+          emailController.text = userEmail;
+          passwordController.text = userPassword;
+
+          // Call signUserIn method directly
+          signUserIn();
+        }
       }
     }
-  }
+
 
   /* **************** SaveUserData  F U N C T I O N ******************* */
 
@@ -80,13 +82,15 @@ class LoginPageState extends State<LoginPage>
     });
   }
 
-  /* **************** C R Y P T A G E   F U N C T I O N ******************* */
 
+  /* **************** C R Y P T A G E   F U N C T I O N ******************* */
   String cryptageData(String input) 
   {
     return md5.convert(utf8.encode(input)).toString();
   }
 
+
+   /* **************** Save user data ******************* */
   void saveUserData(String userEmail, String userPass, String uidu) async 
   {
     SharedPreferences pref = await SharedPreferences.getInstance();
@@ -94,6 +98,14 @@ class LoginPageState extends State<LoginPage>
     pref.setString('password', userPass);
     pref.setString('ui', uidu);
   }
+
+  /* **************** Save Remember User ******************* */
+  Future<void> saveRememberUser(bool remember) async 
+  {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('rememberUser', remember);
+  }
+
   
  /* **************** L O G I N  F U N C T I O N ******************* */
 
@@ -103,7 +115,6 @@ class LoginPageState extends State<LoginPage>
   String userPassword = passwordController.text;
   String userID = '0';
   String UserId = 'aaa';
-
 
 
   if(userEmail.isEmpty && userPassword.isEmpty)
@@ -576,8 +587,12 @@ class LoginPageState extends State<LoginPage>
                                 {
                                   rememberUser = value!;
                                 });
+
+                                // Save the state of rememberUser to SharedPreferences
+                                saveRememberUser(value!);
                               },
                             ),
+
                             const Text
                             (
                               "Remember me",

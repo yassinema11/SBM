@@ -77,11 +77,13 @@ class HomeState extends State<Home>
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? id = prefs.getString('ui');
 
+    print(id);
+
     if (id != null) 
     {
       try {
         int myInt = int.tryParse(id) ?? 0; // Provide a default value if parsing fails
-        String hexString = myInt.toRadixString(16).padLeft(8, '0'); // Pad to 8 characters with leading zeros
+        String hexString = myInt.toRadixString(16).padLeft(8, '0'); 
 
         print('Hex String: $hexString');
 

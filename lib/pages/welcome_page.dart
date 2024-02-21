@@ -25,12 +25,11 @@ class WelcomePageState extends State<WelcomePage>
       Icon(Icons.person, size: 25),
       Icon(Icons.home, size: 25),
       Icon(Icons.settings, size: 25),
-      Icon(Icons.maps_ugc_sharp, size: 25),
     ];
 
     int index = 1;
     String selectedLanguage = 'English';
-    
+
     bool isDarkMode = true;
 
   Future<void> loadSet() async 
@@ -66,7 +65,9 @@ class WelcomePageState extends State<WelcomePage>
         height: 50,
         items: items,
         index: index,        
-        backgroundColor: isDarkMode ? Colors.black : Colors.white,
+        backgroundColor: Colors.white,
+        buttonBackgroundColor: Colors.white,
+        color: isDarkMode? Colors.black : Colors.white,
 
         animationDuration: const Duration(milliseconds: 10),
         animationCurve: Curves.easeInOut,

@@ -54,7 +54,6 @@ class ProfileState extends State<Profile>
   
   void Logout() async 
   {
-
     QuickAlert.show
     (
       context: context,
@@ -92,88 +91,67 @@ class ProfileState extends State<Profile>
   
   Future<void> ProfileData() async 
   {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? Em = prefs.getString('user');
 
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? Em = prefs.getString('user');
-
-    try 
+  try 
+  {
+    if (Em == null) 
     {
-      if (Em == null) 
+      print('User email is null');
+      return;
+    }
+
+    String server = prefs.getString('server') ?? '192.168.178.16';
+    String port = prefs.getString('port') ?? '5000';
+    final userUrl = 'http://$server:$port/user?email=$Em';
+
+    final response = await http.get
+    (
+      Uri.parse(userUrl),
+      headers: <String, String>
       {
-        print('User email is null');
-        return;
-      }
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    );
 
+    if (response.statusCode == 200) 
+    {
+      final userData = jsonDecode(response.body);
 
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String server = prefs.getString('server') ?? '192.168.178.16';
-      String port = prefs.getString('port') ?? '5000';
+      setState(() 
+      {
+        name = userData['name'] ?? '';
+        mail = userData['email'] ?? '';
+        phone = userData['phone'] ?? '';
+        curpas = userData['password'] ?? '';
 
-      final userUrl = 'http://$server:$port/user?email=$Em';
-      //final lpnsUrl = 'http://$server:$port/lpns';
+        dynamic lpnsData = userData['lpns'] ?? [];
+        lpns = [];
 
-      final response = await http.get
-      (
-        Uri.parse(userUrl),
-        headers: <String, String>
+        if (lpnsData is List) 
         {
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-      );
-
-
-      if (response.statusCode == 200 || response.statusCode == 201) 
-      {
-          final userData = jsonDecode(response.body);
-
-          setState(() 
+          for (int i = 0; i < lpnsData.length; i++) 
           {
-            name = userData['name'] ?? ''; 
-            mail = userData['email'] ?? ''; 
-            phone = userData['phone'] ?? '';
-            curpas = userData['password'] ?? '';
-
-            dynamic lpnsData = userData['lpns'] ?? [];
-            lpns = (lpnsData is List) ? List<Map<String, dynamic>>.from(lpnsData) : [];
-           });
-        } 
-        else if (response.statusCode == 404) 
-        {
-          print("User not found");
+            lpns.add({'plateNumber': lpnsData[i], 'index': i});
+          }
         } 
         else 
         {
-          print("Failed to load user data: ${response.statusCode}");
+          print('lpnsData is not a List');
         }
-
-        /*final lpnsResponse = await http.get
-        (
-          Uri.parse(userUrl),
-          headers: <String, String>
-          {
-            'Content-Type': 'application/json; charset=UTF-8',
-          },
-        );
-
-        if (lpnsResponse.statusCode == 200) 
-        {
-          final lpnsData = jsonDecode(lpnsResponse.body);
-
-          setState(()
-          {
-            lpns = List<Map<String, dynamic>>.from(lpnsData);
-          });
-        }
-        else 
-        {
-          print("Failed to load lpns data: ${lpnsResponse.statusCode}");
-        }*/
-      }
-      catch (e) 
-      {
-        print('Error fetching user data: $e');
-      }
+      });
+    } 
+    else 
+    {
+      print("Failed to load user data: ${response.statusCode}");
+    }
+  } 
+  catch (e) 
+  {
+    print('Error fetching user data: $e');
   }
+}
 
   Future<void> showUpdateUserDialog() async 
   {
@@ -446,8 +424,17 @@ class ProfileState extends State<Profile>
               ),
            ),
                         
-            backgroundColor: isDarkMode ? Color(0xFF080a16) : Colors.white,
-             centerTitle: true,
+              backgroundColor: isDarkMode ? Color(0xFF080a16) : Colors.white,
+              centerTitle: true,
+              leading: IconButton
+              (
+                onPressed: Logout,
+                icon: Icon
+                (
+                  Icons.logout,      
+                  color: isDarkMode ? Colors.white : Colors.black,
+                ),
+              ),
               actions: 
               [
                            Padding
@@ -565,11 +552,11 @@ class ProfileState extends State<Profile>
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: 
                         [
-                          SizedBox(width:15),
+                            SizedBox(width:15),
                         
                           Icon(Icons.mail, color: isDarkMode ? Color(0xFF5e3b91): Color.fromARGB(255, 213, 190, 252)),
                   
-                          SizedBox(width:15),
+                            SizedBox(width:15),
                   
                           Text
                           (
@@ -596,7 +583,7 @@ class ProfileState extends State<Profile>
                       height: 40,
                       decoration: BoxDecoration
                       (
-                         color: isDarkMode ? Colors.white : Colors.black,
+                        color: isDarkMode ? Colors.white : Colors.black,
                         borderRadius: BorderRadius.circular(20),
                       ),
                   
@@ -629,63 +616,63 @@ class ProfileState extends State<Profile>
                         
                   Center
                   (
-                  child: Container
-                  (
-                    height: 90,
-                    width: 350, 
-                    child: ListView.builder
+                    child: Align
                     (
-                      itemCount: lpns.length,
-                      itemBuilder: (BuildContext context, int index) 
-                      {
-                        return Container
+                      alignment: Alignment.topCenter,
+                      child: Container
+                      (
+                        height: 300,
+                        width: 350,
+                        child: ListView.builder
                         (
-                          width: 350,
-                          height: 40,
-                          margin: EdgeInsets.symmetric(vertical: 3),
-                        
-                          decoration: BoxDecoration
-                          (
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                        
-                          child: Row
-                          (
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: 
-                            [                                                    
-                              SizedBox(width:15),
-                        
-                              Icon
+                          itemCount: lpns.length,
+                          itemBuilder: (BuildContext context, int index) 
+                          {
+                            return Container
+                            (
+                              width: 350,
+                              height: 40,
+                              margin: EdgeInsets.symmetric(vertical: 3),
+                              decoration: BoxDecoration
                               (
-                                lpns[index]['icon'],
-                                color: lpns[index]['iconColor'],
+                                color: isDarkMode ? Colors.white : Colors.black,
+                                borderRadius: BorderRadius.circular(20),
                               ),
-                        
-                              SizedBox(width: 10),
-                        
-                              Text
+
+                              child: Row
                               (
-                                lpns[index]['plateNumber'] ?? '',
-                                style: TextStyle
-                                (
-                                  color: Colors.black,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: 
+                                [
+                                  SizedBox(width: 15),
+                                  Icon
+                                  (
+                                    Icons.directions_car_filled,
+                                    color: isDarkMode ? Color(0xFF5e3b91) : Color.fromARGB(255, 213, 190, 252),
+                                  ),
+                                  
+                                  SizedBox(width: 10),
+
+                                  Text
+                                  (
+                                    lpns[index]['plateNumber'] ?? '',
+                                    style: TextStyle
+                                    (
+                                      color: isDarkMode ? Colors.black : Colors.white,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                        );
-                      },
+                            );
+                          },
+                        ),
+                      ),
                     ),
                   ),
-                ),
                         
-                  const SizedBox(height:60),
-                        
-                  Center
+                  /*Center
                   (
                     child: GestureDetector
                     (
@@ -729,7 +716,7 @@ class ProfileState extends State<Profile>
                         ),
                       ),
                     ),
-                  ),   
+                  ),*/  
                 ],
               ),
             );
