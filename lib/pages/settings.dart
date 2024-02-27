@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously, prefer_const_constructors, unused_element, avoid_print
+// ignore_for_file: use_build_context_synchronously, prefer_const_constructors, unused_element, avoid_print, unused_local_variable, avoid_unnecessary_containers, sized_box_for_whitespace
 
 import 'package:flutter/material.dart';
 import 'package:screen_brightness/screen_brightness.dart';
@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class Settings extends StatefulWidget 
 {
-  const Settings({Key? key}) : super(key: key);
+  const Settings({super.key});
 
   @override
   State<Settings> createState() => _SettingsState();
@@ -69,151 +69,162 @@ class _SettingsState extends State<Settings>
   @override
   Widget build(BuildContext context) 
   {
-    return Scaffold
+    var screenHeight = MediaQuery.of(context).size.height;
+    var screenWidth = MediaQuery.of(context).size.width;
+
+    return Container
     (
-      resizeToAvoidBottomInset: false,
-      backgroundColor: isDarkMode ? Color(0xFF080a16) : Colors.white,
-      appBar: AppBar
+      height: screenHeight,
+      width: screenWidth,
+      
+      child: Scaffold
       (
-        automaticallyImplyLeading: false,
-        title: Text
+        resizeToAvoidBottomInset: false,
+        backgroundColor: isDarkMode ? Color(0xFF080a16) : Colors.white,
+        appBar: AppBar
         (
-          "Settings",
-          style: TextStyle
+          automaticallyImplyLeading: false,
+          title: Text
           (
-            fontWeight: FontWeight.bold,
-            fontSize: 25,
-            color: isDarkMode ? Colors.white : Colors.black          
+            "Settings",
+            style: TextStyle
+            (
+              fontWeight: FontWeight.bold,
+              fontSize: 25,
+              color: isDarkMode ? Colors.white : Colors.black          
+            ),
           ),
+
+        backgroundColor: isDarkMode ? Color(0xFF080a16) : Colors.white,
+        
+        centerTitle: true,
         ),
-      backgroundColor: isDarkMode ? Color(0xFF080a16) : Colors.white,
-      centerTitle: true,
-      ),
-      body: Padding
-      (
-        padding: const EdgeInsets.all(16.0),
-        child: Column
+        body: Padding
         (
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>
-          [
-            Text
-            (
-              'Brightness',
-              style: TextStyle
+          padding: const EdgeInsets.all(16.0),
+          child: Column
+          (
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>
+            [
+              Text
               (
-                fontSize: 18.0, 
-                fontWeight: FontWeight.bold, 
-                color: isDarkMode ? Colors.white : Colors.black
+                'Brightness',
+                style: TextStyle
+                (
+                  fontSize: 18.0, 
+                  fontWeight: FontWeight.bold, 
+                  color: isDarkMode ? Colors.white : Colors.black
+                ),
               ),
-            ),
-           Slider
-           (
-              value: brightness,
-              onChanged: (value) 
-              {
-                setState(() 
+             Slider
+             (
+                value: brightness,
+                onChanged: (value) 
                 {
-                  setBrightness(value);
-                  brightness = value; 
-                });
-              },
-            ),
-
-            
-            SizedBox(height: 20.0),
-
-            Row
-            (
-              children: 
-              [
-                Text
-                (
-                  'Language',
-                  style: TextStyle
-                  (
-                    fontSize: 18.0, 
-                    fontWeight: FontWeight.bold, 
-                    color: isDarkMode ? Colors.white : Colors.black
-                  ),
-                ),
-                SizedBox(width: 40),
-
-            DropdownButton<String>
-            (
-              iconSize: 24,
-              elevation: 16,
-              focusColor: isDarkMode?  Colors.black : Colors.white,
-              dropdownColor: isDarkMode?  Colors.black : Colors.white,
-              value: selectedLanguage,
-              onChanged: (newValue) 
-              {
-                setState(() 
-                {
-                  selectedLanguage = newValue!;
-                });
-              },
-
-              items: <String>['English', 'French', 'Arabic'].map<DropdownMenuItem<String>>((String value) 
-              {
-                return DropdownMenuItem<String>
-                (
-                  value: value,
-                  child: Text
-                  (
-                    value,
-                  ),
-                );
-              }).toList(),
-            ),
-
-              ],
-            ),
-            
-            SizedBox(height: 20.0),
-            
-            Row(
-              children: <Widget>
-              [
-                Text
-                (
-                  'Dark Mode',
-                  style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: isDarkMode ? Colors.white : Colors.black),
-                ),
-
-                SizedBox(width: 40),
-
-                Switch
-                (
-                  value: isDarkMode,
-                  onChanged: (value) 
+                  setState(() 
                   {
-                    setState(()
-                    {
-                      isDarkMode = value;
-                    });
-                  },
-                ),
-              ],
-            ),
-
-            SizedBox(height: 50.0),
-
-            Center
-            (
-              child: ElevatedButton
+                    setBrightness(value);
+                    brightness = value; 
+                  });
+                },
+              ),
+      
+              
+              SizedBox(height: 20.0),
+      
+              Row
               (
-                onPressed: saveSettings,
-                style: ElevatedButton.styleFrom(backgroundColor: isDarkMode ? Colors.white : Colors.black),
-                child: 
+                children: 
+                [
                   Text
                   (
-                    'Save Settings',
-                    style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: isDarkMode ? Colors.black : Colors.white),
+                    'Language',
+                    style: TextStyle
+                    (
+                      fontSize: 18.0, 
+                      fontWeight: FontWeight.bold, 
+                      color: isDarkMode ? Colors.white : Colors.black
+                    ),
                   ),
+                  SizedBox(width: 40),
+      
+              DropdownButton<String>
+              (
+                iconSize: 24,
+                elevation: 16,
+                focusColor: isDarkMode?  Colors.black : Colors.white,
+                dropdownColor: isDarkMode?  Colors.black : Colors.white,
+                value: selectedLanguage,
+                onChanged: (newValue) 
+                {
+                  setState(() 
+                  {
+                    selectedLanguage = newValue!;
+                  });
+                },
+      
+                items: <String>['English', 'French', 'Arabic'].map<DropdownMenuItem<String>>((String value) 
+                {
+                  return DropdownMenuItem<String>
+                  (
+                    value: value,
+                    child: Text
+                    (
+                      value,
+                    ),
+                  );
+                }).toList(),
               ),
-            ),
-          ],
+      
+                ],
+              ),
+              
+              SizedBox(height: 20.0),
+              
+              Row(
+                children: <Widget>
+                [
+                  Text
+                  (
+                    'Dark Mode',
+                    style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold, color: isDarkMode ? Colors.white : Colors.black),
+                  ),
+      
+                  SizedBox(width: 40),
+      
+                  Switch
+                  (
+                    value: isDarkMode,
+                    onChanged: (value) 
+                    {
+                      setState(()
+                      {
+                        isDarkMode = value;
+                      });
+                    },
+                  ),
+                ],
+              ),
+      
+              SizedBox(height: 50.0),
+      
+              Center
+              (
+                child: ElevatedButton
+                (
+                  onPressed: saveSettings,
+                  style: ElevatedButton.styleFrom(backgroundColor: isDarkMode ? Colors.white : Colors.black),
+                  child: 
+                    Text
+                    (
+                      'Save Settings',
+                      style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: isDarkMode ? Colors.black : Colors.white),
+                    ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

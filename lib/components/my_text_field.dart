@@ -11,13 +11,13 @@ class MyTextField extends StatefulWidget
   const MyTextField
   (
     {
-      Key? key,
+      super.key,
       required this.controller,
       required this.hintText,
       required this.obscureText,
       required this.labelt,
     }
-  ) : super(key: key);
+  );
 
   @override
   MyTextFieldState createState() => MyTextFieldState();

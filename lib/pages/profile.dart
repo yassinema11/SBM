@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors, file_names, prefer_const_literals_to_create_immutables, sized_box_for_whitespace, avoid_print, unnecessary_null_comparison, non_constant_identifier_names, unused_local_variable, unused_element, use_build_context_synchronously, unused_label, unused_import
+// ignore_for_file: prefer_const_constructors, file_names, prefer_const_literals_to_create_immutables, sized_box_for_whitespace, avoid_print, unnecessary_null_comparison, non_constant_identifier_names, unused_local_variable, unused_element, use_build_context_synchronously, unused_label, unused_import, avoid_unnecessary_containers
 
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
@@ -12,7 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class Profile extends StatefulWidget 
 {
 
-  const Profile({Key? key}) : super(key: key);
+  const Profile({super.key});
 
   @override
   State<Profile> createState() => ProfileState();
@@ -399,263 +399,138 @@ class ProfileState extends State<Profile>
   @override
   Widget build(BuildContext context) 
   {
-    return Scaffold
-    (
-      
-      resizeToAvoidBottomInset: false,
-      backgroundColor: isDarkMode ? Color(0xFF080a16) : Colors.white,
+    var screenHeight = MediaQuery.of(context).size.height;
+    var screenWidth = MediaQuery.of(context).size.width;
 
-      body: Column
+    return Container
+    (
+      height: screenHeight,
+      width: screenWidth,
+
+      child: Scaffold
       (
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: 
-        [
-          AppBar
+        resizeToAvoidBottomInset: false,
+        backgroundColor: isDarkMode ? Color(0xFF080a16) : Colors.white,
+      
+        body: SingleChildScrollView
+        (
+          child: Column
           (
-            automaticallyImplyLeading: false,
-            title: Text
-            (
-              "Profile",
-              style: TextStyle
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: 
+            [
+              AppBar
               (
-                fontWeight: FontWeight.bold,
-                fontSize: 25,
-                color: isDarkMode ? Colors.white : Colors.black,
-              ),
-           ),
-                        
-              backgroundColor: isDarkMode ? Color(0xFF080a16) : Colors.white,
-              centerTitle: true,
-              leading: IconButton
-              (
-                onPressed: Logout,
-                icon: Icon
+                automaticallyImplyLeading: false,
+                title: Text
                 (
-                  Icons.logout,      
-                  color: isDarkMode ? Colors.white : Colors.black,
-                ),
-              ),
-              actions: 
-              [
-                           Padding
-                           (
-                             padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                             child: IconButton
-                             (
-                                icon: Icon
-                                (
-                                  Icons.edit,
-                                  color: isDarkMode ? Colors.white : Colors.black,
-                                  size: 30,
-                                ),
-                                tooltip: 'Edit Profile',
-                                onPressed: showUpdateUserDialog,
-                            ),
-                           )  
-                        ],
+                  "Profile",
+                  style: TextStyle
+                  (
+                    fontWeight: FontWeight.bold,
+                    fontSize: 25,
+                    color: isDarkMode ? Colors.white : Colors.black,
+                  ),
+               ),
+                            
+                  backgroundColor: isDarkMode ? Color(0xFF080a16) : Colors.white,
+                  centerTitle: true,
+                  leading:
+                    IconButton
+                    (
+                      onPressed: Logout,
+                      icon: Icon
+                      (
+                        Icons.logout,      
+                        color: isDarkMode ? Colors.white : Colors.black,
                       ),
+                    ),
+                  actions: 
+                  [
+                    Padding
+                    (
+                      padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                      child: IconButton
+                      (
+                        icon: Icon
+                        (
+                          Icons.edit,
+                          color: isDarkMode ? Colors.white : Colors.black,
+                          size: 30,
+                        ),
                         
-                    const SizedBox(height:30),
+                        tooltip: 'Edit Profile',
+                        onPressed: showUpdateUserDialog,
+                      ),
+                    )  
+                  ],
+                ),                         
+                            
+                const SizedBox(height:30),
+                            
+                          Center
+                          (
+                            child: Container
+                            (
+                              width: 120,
+                              height: 120,
+                              decoration: BoxDecoration
+                              (
+                                shape: BoxShape.circle,
+                              ),
+                              child: Padding
+                              (
+                                padding: EdgeInsetsDirectional.fromSTEB(4, 4, 4, 4),
+                                child: ProfilePicture
+                                (
+                                  name: name,
+                                  radius: 31,
+                                  fontsize: 45,
+                                  tooltip: true,
+                                  role: 'User',
+                                ),
+                              ),
+                            ),
+                          ),
                         
+                      const SizedBox(height:20),
+                            
                       Center
                       (
                         child: Container
                         (
-                          width: 120,
-                          height: 120,
+                          width: 350,
+                          height: 40,
                           decoration: BoxDecoration
                           (
-                            shape: BoxShape.circle,
+                             color: isDarkMode ? Colors.white : Colors.black,
+                            borderRadius: BorderRadius.circular(15),
                           ),
-                          child: Padding
+                      
+                          child: Row
                           (
-                            padding: EdgeInsetsDirectional.fromSTEB(4, 4, 4, 4),
-                            child: ProfilePicture
-                            (
-                              name: name,
-                              radius: 31,
-                              fontsize: 45,
-                              tooltip: true,
-                              role: 'User',
-                            ),
-                          ),
-                        ),
-                      ),
-                    
-                  const SizedBox(height:20),
-                        
-                  Center
-                  (
-                    child: Container
-                    (
-                      width: 350,
-                      height: 40,
-                      decoration: BoxDecoration
-                      (
-                         color: isDarkMode ? Colors.white : Colors.black,
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                  
-                      child: Row
-                      (
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: 
-                        [
-                          SizedBox(width:15),
-                        
-                          Padding
-                          (
-                            padding: EdgeInsets.zero,
-                            child: Icon
-                            (
-                              Icons.person, color: isDarkMode ? Color(0xFF5e3b91): Color.fromARGB(255, 213, 190, 252),
-                            ),
-                          ),
-                        
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: 
+                            [
                               SizedBox(width:15),
-                  
-                            Container
-                            (
-                              alignment: Alignment.center,
-                              child: Text
+                            
+                              Padding
                               (
-                                name,
-                                style: TextStyle
+                                padding: EdgeInsets.zero,
+                                child: Icon
                                 (
-                                  color: isDarkMode ? Colors.black : Colors.white,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
+                                  Icons.person, color: isDarkMode ? Color(0xFF5e3b91): Color.fromARGB(255, 213, 190, 252),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                        
-                  const SizedBox(height:20),
-                        
-                  Center
-                  (
-                    child: Container
-                    (
-                      width: 350,
-                      height: 40,
-                      decoration: BoxDecoration
-                      (
-                         color: isDarkMode ? Colors.white : Colors.black,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                  
-                      child: Row
-                      (
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: 
-                        [
-                            SizedBox(width:15),
-                        
-                          Icon(Icons.mail, color: isDarkMode ? Color(0xFF5e3b91): Color.fromARGB(255, 213, 190, 252)),
-                  
-                            SizedBox(width:15),
-                  
-                          Text
-                          (
-                            mail,
-                            style: TextStyle
-                            (
-                              color: isDarkMode ? Colors.black : Colors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                        
-          const SizedBox(height:20),
-                        
-                  Center
-                  (
-                    child: Container
-                    (
-                      width: 350,
-                      height: 40,
-                      decoration: BoxDecoration
-                      (
-                        color: isDarkMode ? Colors.white : Colors.black,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                  
-                      child: Row
-                      (
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: 
-                        [
-                          SizedBox(width:15),
-                        
-                          Icon(Icons.phone,color: isDarkMode ? Color(0xFF5e3b91) : Color.fromARGB(255, 213, 190, 252) ),
-                  
-                          SizedBox(width:15),
-                  
-                          Text
-                          (
-                            phone,
-                            style: TextStyle
-                            (
-                              color: isDarkMode ? Colors.black : Colors.white,
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                        
-                        
-                  Center
-                  (
-                    child: Align
-                    (
-                      alignment: Alignment.topCenter,
-                      child: Container
-                      (
-                        height: 300,
-                        width: 350,
-                        child: ListView.builder
-                        (
-                          itemCount: lpns.length,
-                          itemBuilder: (BuildContext context, int index) 
-                          {
-                            return Container
-                            (
-                              width: 350,
-                              height: 40,
-                              margin: EdgeInsets.symmetric(vertical: 3),
-                              decoration: BoxDecoration
-                              (
-                                color: isDarkMode ? Colors.white : Colors.black,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-
-                              child: Row
-                              (
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: 
-                                [
-                                  SizedBox(width: 15),
-                                  Icon
+                            
+                                  SizedBox(width:15),
+                      
+                                Container
+                                (
+                                  alignment: Alignment.center,
+                                  child: Text
                                   (
-                                    Icons.directions_car_filled,
-                                    color: isDarkMode ? Color(0xFF5e3b91) : Color.fromARGB(255, 213, 190, 252),
-                                  ),
-                                  
-                                  SizedBox(width: 10),
-
-                                  Text
-                                  (
-                                    lpns[index]['plateNumber'] ?? '',
+                                    name,
                                     style: TextStyle
                                     (
                                       color: isDarkMode ? Colors.black : Colors.white,
@@ -663,62 +538,200 @@ class ProfileState extends State<Profile>
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                  ),
-                        
-                  /*Center
-                  (
-                    child: GestureDetector
-                    (
-                      onTap: Logout,
-                      child: Container
-                      (
-                        width: 200,
-                        height: 60,
-                        alignment: Alignment.center,
-                        
-                        decoration: BoxDecoration
-                        (
-                          color: Colors.black,
-                          borderRadius: BorderRadius.circular(20),
-                          gradient: RadialGradient
-                          (
-                            radius: 1,
-                            
-                            colors: <Color>
-                            [
-                              Color.fromARGB(255, 149, 97, 202),
-                              Color(0xFF810cf5),
-                              Color(0xFFa64efc),
-                            ]
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      
-                        child: Padding
+                            
+                      const SizedBox(height:20),
+                            
+                      Center
+                      (
+                        child: Container
                         (
-                          padding: EdgeInsets.all(15.0),
-                          child: Text
+                          width: 350,
+                          height: 40,
+                          decoration: BoxDecoration
                           (
-                            'Logout ',
-                            style: TextStyle
+                             color: isDarkMode ? Colors.white : Colors.black,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                      
+                          child: Row
+                          (
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: 
+                            [
+                                SizedBox(width:15),
+                            
+                              Icon(Icons.mail, color: isDarkMode ? Color(0xFF5e3b91): Color.fromARGB(255, 213, 190, 252)),
+                      
+                                SizedBox(width:15),
+                      
+                              Text
+                              (
+                                mail,
+                                style: TextStyle
+                                (
+                                  color: isDarkMode ? Colors.black : Colors.white,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                            
+              const SizedBox(height:20),
+                            
+                      Center
+                      (
+                        child: Container
+                        (
+                          width: 350,
+                          height: 40,
+                          decoration: BoxDecoration
+                          (
+                            color: isDarkMode ? Colors.white : Colors.black,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                      
+                          child: Row
+                          (
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: 
+                            [
+                              SizedBox(width:15),
+                            
+                              Icon(Icons.phone,color: isDarkMode ? Color(0xFF5e3b91) : Color.fromARGB(255, 213, 190, 252) ),
+                      
+                              SizedBox(width:15),
+                      
+                              Text
+                              (
+                                phone,
+                                style: TextStyle
+                                (
+                                  color: isDarkMode ? Colors.black : Colors.white,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                            
+                            
+                      Center
+                      (
+                        child: Align
+                        (
+                          alignment: Alignment.topCenter,
+                          child: Container
+                          (
+                            height: 300,
+                            width: 350,
+                            child: ListView.builder
                             (
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                              itemCount: lpns.length,
+                              itemBuilder: (BuildContext context, int index) 
+                              {
+                                return Container
+                                (
+                                  width: 350,
+                                  height: 40,
+                                  margin: EdgeInsets.symmetric(vertical: 3),
+                                  decoration: BoxDecoration
+                                  (
+                                    color: isDarkMode ? Colors.white : Colors.black,
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                
+                                  child: Row
+                                  (
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: 
+                                    [
+                                      SizedBox(width: 15),
+                                      Icon
+                                      (
+                                        Icons.directions_car_filled,
+                                        color: isDarkMode ? Color(0xFF5e3b91) : Color.fromARGB(255, 213, 190, 252),
+                                      ),
+                                      
+                                      SizedBox(width: 10),
+                
+                                      Text
+                                      (
+                                        lpns[index]['plateNumber'] ?? '',
+                                        style: TextStyle
+                                        (
+                                          color: isDarkMode ? Colors.black : Colors.white,
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ),*/  
-                ],
+                            
+                      /*Center
+                      (
+                        child: GestureDetector
+                        (
+                          onTap: Logout,
+                          child: Container
+                          (
+                            width: 200,
+                            height: 60,
+                            alignment: Alignment.center,
+                            
+                            decoration: BoxDecoration
+                            (
+                              color: Colors.black,
+                              borderRadius: BorderRadius.circular(20),
+                              gradient: RadialGradient
+                              (
+                                radius: 1,
+                                
+                                colors: <Color>
+                                [
+                                  Color.fromARGB(255, 149, 97, 202),
+                                  Color(0xFF810cf5),
+                                  Color(0xFFa64efc),
+                                ]
+                              ),
+                            ),
+                          
+                            child: Padding
+                            (
+                              padding: EdgeInsets.all(15.0),
+                              child: Text
+                              (
+                                'Logout ',
+                                style: TextStyle
+                                (
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),*/  
+                    ],
+                  ),
+        ),
               ),
-            );
+    );
   }
 }

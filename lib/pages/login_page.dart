@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api, avoid_print, non_constant_identifier_names, unused_import, unused_local_variable, use_build_context_synchronously, unused_element, prefer_const_constructors
+// ignore_for_file: library_private_types_in_public_api, avoid_print, non_constant_identifier_names, unused_import, unused_local_variable, use_build_context_synchronously, unused_element, prefer_const_constructors, sized_box_for_whitespace
 
 import 'package:flutter/material.dart';
 import 'package:quickalert/quickalert.dart';
@@ -10,7 +10,7 @@ import 'dart:convert';
 
 class LoginPage extends StatefulWidget 
 {
-  const LoginPage({Key? key}) : super(key: key);
+  const LoginPage({super.key});
 
   @override
   LoginPageState createState() => LoginPageState();
@@ -360,7 +360,6 @@ class LoginPageState extends State<LoginPage>
     var screenHeight = MediaQuery.of(context).size.height;
     var screenWidth = MediaQuery.of(context).size.width;
 
-
     Map<String, dynamic>? arguments = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
 
     if (arguments != null && arguments.containsKey('email')) 
@@ -370,330 +369,333 @@ class LoginPageState extends State<LoginPage>
     }
 
 
-      /* **************** S C A F F O L D ******************* */
-
-    return Scaffold
+    return Container
     (
-      resizeToAvoidBottomInset: true, 
-      backgroundColor: const Color(0xFF080a16),
+      height: screenHeight,
+      width: screenWidth,
 
-      
-
-      /* **************** B O D Y  ******************* */
-      body: SingleChildScrollView
+      child: Scaffold
       (
-        child: SafeArea
+        resizeToAvoidBottomInset: true, 
+        backgroundColor: const Color(0xFF080a16),
+        
+      
+        /* **************** B O D Y  ******************* */
+        body: SingleChildScrollView
         (
-          child: Form
+          child: SafeArea
           (
-            key: form,
-            autovalidateMode: AutovalidateMode.always,
-            child: Center
+            child: Form
             (
-              child: Column
+              key: form,
+              autovalidateMode: AutovalidateMode.always,
+              child: Center
               (
-                children: 
-                [
-        
-                  GestureDetector
-                  (
-                    onTap: SettingsLogin,
-                    child: const Row
-                      (
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: 
-                      [
-                        Padding
-                        (
-                          padding: EdgeInsets.symmetric(horizontal: 25, vertical: 5),
-                          child: Icon(Icons.settings,color: Colors.white,size: 35),
-                        ),
-                      ],
-                    ),
-                  ),
-        
-                  const SizedBox(height: 40),
-        
-                  Container
-                  (
-                      width: MediaQuery.of(context).size.width-100,
-                      height: 150,
-                      decoration: BoxDecoration
-                      (
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-        
-                    child: Center
+                child: Column
+                (
+                  children: 
+                  [
+          
+                    GestureDetector
                     (
-                      /* **************** L O G O : S B M  ******************* */
-                      child: Image.asset
-                      (
-                        'images/logo_sheidt.png',
-                        height: 200,
-                        width: 200,
-                      ),
-                    ),
-                  ),
-        
-                const SizedBox(height: 40),
-                  
-                  /* **************** T E X T : WELCOME BACK ******************* */
-        
-                  const Text
-                  (
-                    " Welcome Back ",
-                    style: TextStyle(color: Colors.white, fontSize: 20),
-                  ),
-        
-                  const SizedBox(height: 20),
-        
-        
-                /* **************** F I E L D : EMAIL ******************* */
-                  SizedBox
-                  (
-                    height: 70,
-                    width: MediaQuery.of(context).size.width-60,
-                    child: TextFormField
-                    (
-                      controller: emailController,
-                      validator: (value) 
-                      {
-                        if (value?.isEmpty ?? true)
-                        {
-                          return 'Email is required';
-                        }
-        
-                        /*
-                        else if (!value!.contains('@')) 
-                        {
-                          return 'Invalid email format';
-                        }
-                        */
-                        return null;
-                      },
-        
-                      decoration: InputDecoration
-                      (
-                        labelText: 'Email',
-                        labelStyle: const TextStyle(color: Colors.black),
-        
-                        enabledBorder: const OutlineInputBorder
+                      onTap: SettingsLogin,
+                      child: const Row
                         (
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-        
-                        focusedBorder: const OutlineInputBorder
-                        (
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-        
-                        fillColor: Colors.grey.shade200,
-                        filled: true,
-        
-        
-        
-                        hintStyle: const TextStyle(color: Colors.black),
-        
-                      ),
-                    ),
-                  ),
-        
-                  const SizedBox(height: 10),
-        
-            /* **************** F I E L D : Password ******************* */
-        
-                  SizedBox
-                  (
-                    height: 70,
-                    width: MediaQuery.of(context).size.width-60,
-                    child: TextFormField
-                    (
-                      controller: passwordController,
-                      obscureText: isObscure,
-        
-                      validator: (value) 
-                      {
-                        if (value?.isEmpty ?? true) 
-                        {
-                          return 'Password is required';
-                        }
-        
-                        return null;
-                      },
-        
-                      decoration: InputDecoration
-                      (
-                        labelText: 'Password',
-                        floatingLabelBehavior:FloatingLabelBehavior.auto,
-                        enabledBorder: const OutlineInputBorder
-                        (
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-                        focusedBorder: const OutlineInputBorder
-                        (
-                          borderSide: BorderSide(color: Colors.white),
-                        ),
-                        fillColor: Colors.grey.shade200,
-                        filled: true,
-                        suffixIcon: IconButton
-                        (
-                          onPressed: () 
-                          {
-                            setState(() 
-                            {
-                              isObscure = !isObscure;
-                            });
-                          },
-        
-               /* **************** I C O N : Show / Hide ******************* */
-        
-                          icon: Icon
-                          (
-                            isObscure
-                                ? Icons.visibility_off
-                                : Icons.visibility,
-        
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-        
-                  const SizedBox(height: 10),
-        
-          /* **************** R A W  ******************* */
-                  Row
-                  (
-                    mainAxisAlignment: MainAxisAlignment.center,
-
-                    children: 
-                    [
-                      SizedBox
-                      (
-                        width: MediaQuery.of(context).size.width-200,
-                        child: Row
-                        (
-                          children: 
-                          [
-                          /* **************** C H E C K B O X ******************* */
-                            Checkbox
-                            (
-                              value: rememberUser,
-                              onChanged: (value) 
-                              {
-                                setState(() 
-                                {
-                                  rememberUser = value!;
-                                });
-
-                                // Save the state of rememberUser to SharedPreferences
-                                saveRememberUser(value!);
-                              },
-                            ),
-
-                            const Text
-                            (
-                              "Remember me",
-                                style: TextStyle(color: Colors.white),
-                            ),
-                          ],
-                        ),
-                      ),
-        
-                      const SizedBox(width: 30),
-        
-                      /* **************** T E X T  B U T T O N : forget password  ******************* */
-                      TextButton
-                      (
-                        onPressed: () 
-                        {
-                          PassForget();
-                        },
-                        child: const Text("I forgot my password",style: TextStyle(color: Colors.white),),
-                      ),
-                    ],
-                  ),
-        
-                    //bgColor: 0xFF080a16
-                    //btn :
-                    //      1/ 0xFF810cf5 *** 2/ 0xFF810cf5 *** 3/ 0xFFa64efc
-
-                    // box : 0xFF141931
-            
-                  const SizedBox(height: 25),
-                  
-                  /* **************** L O G I N  B U T T O N  ******************* */
-                  MyButton
-                  (
-                    onTap: signUserIn,
-                    textButton: 'L  O  G  I  N ',
-                    hb: 50,
-                    wb: MediaQuery.of(context).size.width,
-                  ),
-        
-                  const SizedBox(height: 15),
-                  
-        
-                  /* **************** O R  B L O C K  ******************* */
-        
-                  Padding
-                  (
-                    padding: EdgeInsets.symmetric(horizontal: 30.0),
-                    
-                    child: SizedBox
-                    (
-                      
-                      width: MediaQuery.of(context).size.width-20,
-
-                      child: Row
-                      (
+                        mainAxisAlignment: MainAxisAlignment.end,
                         children: 
-                        const 
                         [
-                          Expanded
-                          (
-                            child: Divider
-                            (
-                              thickness: 0.5,
-                              color: Colors.white,
-                            ),
-                          ),
                           Padding
                           (
-                            padding: EdgeInsets.symmetric(horizontal: 10.0),
-                            child: Text
-                            (
-                              'Or ',
-                              style: TextStyle(color: Colors.white),
-                            ),
+                            padding: EdgeInsets.symmetric(horizontal: 25, vertical: 5),
+                            child: Icon(Icons.settings,color: Colors.white,size: 35),
                           ),
-                          Expanded
-                          (
-                            child: Divider
-                            (
-                              thickness: 0.5,
-                              color: Colors.white,
-                            ),
-                          )
                         ],
                       ),
                     ),
-                  ),
-        
-                  const SizedBox(height: 15),
-        
-                  /* **************** R E G I S T E R   B U T T O N ******************* */
-        
-                  MyButton
-                  (
-                    onTap: signUserUp,
-                    textButton: 'R  E  G  I  S  T  E  R ',
-                    hb: 50,
-                    wb: MediaQuery.of(context).size.width,
-                  ),
-                ],
+          
+                    const SizedBox(height: 40),
+          
+                    Container
+                    (
+                        width: MediaQuery.of(context).size.width-100,
+                        height: 150,
+                        decoration: BoxDecoration
+                        (
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+          
+                      child: Center
+                      (
+                        /* **************** L O G O : S B M  ******************* */
+                        child: Image.asset
+                        (
+                          'images/logo_sheidt.png',
+                          height: 200,
+                          width: 200,
+                        ),
+                      ),
+                    ),
+          
+                  const SizedBox(height: 40),
+                    
+                    /* **************** T E X T : WELCOME BACK ******************* */
+          
+                    const Text
+                    (
+                      " Welcome Back ",
+                      style: TextStyle(color: Colors.white, fontSize: 20),
+                    ),
+          
+                    const SizedBox(height: 20),
+          
+          
+                  /* **************** F I E L D : EMAIL ******************* */
+                    SizedBox
+                    (
+                      height: 70,
+                      width: MediaQuery.of(context).size.width-60,
+                      child: TextFormField
+                      (
+                        controller: emailController,
+                        validator: (value) 
+                        {
+                          if (value?.isEmpty ?? true)
+                          {
+                            return 'Email is required';
+                          }
+          
+                          /*
+                          else if (!value!.contains('@')) 
+                          {
+                            return 'Invalid email format';
+                          }
+                          */
+                          return null;
+                        },
+          
+                        decoration: InputDecoration
+                        (
+                          labelText: 'Email',
+                          labelStyle: const TextStyle(color: Colors.black),
+          
+                          enabledBorder: const OutlineInputBorder
+                          (
+                            borderSide: BorderSide(color: Colors.white),
+                          ),
+          
+                          focusedBorder: const OutlineInputBorder
+                          (
+                            borderSide: BorderSide(color: Colors.white),
+                          ),
+          
+                          fillColor: Colors.grey.shade200,
+                          filled: true,
+          
+          
+          
+                          hintStyle: const TextStyle(color: Colors.black),
+          
+                        ),
+                      ),
+                    ),
+          
+                    const SizedBox(height: 10),
+          
+              /* **************** F I E L D : Password ******************* */
+          
+                    SizedBox
+                    (
+                      height: 70,
+                      width: MediaQuery.of(context).size.width-60,
+                      child: TextFormField
+                      (
+                        controller: passwordController,
+                        obscureText: isObscure,
+          
+                        validator: (value) 
+                        {
+                          if (value?.isEmpty ?? true) 
+                          {
+                            return 'Password is required';
+                          }
+          
+                          return null;
+                        },
+          
+                        decoration: InputDecoration
+                        (
+                          labelText: 'Password',
+                          floatingLabelBehavior:FloatingLabelBehavior.auto,
+                          enabledBorder: const OutlineInputBorder
+                          (
+                            borderSide: BorderSide(color: Colors.white),
+                          ),
+                          focusedBorder: const OutlineInputBorder
+                          (
+                            borderSide: BorderSide(color: Colors.white),
+                          ),
+                          fillColor: Colors.grey.shade200,
+                          filled: true,
+                          suffixIcon: IconButton
+                          (
+                            onPressed: () 
+                            {
+                              setState(() 
+                              {
+                                isObscure = !isObscure;
+                              });
+                            },
+          
+                 /* **************** I C O N : Show / Hide ******************* */
+          
+                            icon: Icon
+                            (
+                              isObscure
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+          
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+          
+                    const SizedBox(height: 10),
+          
+            /* **************** R A W  ******************* */
+                    Row
+                    (
+                      mainAxisAlignment: MainAxisAlignment.center,
+      
+                      children: 
+                      [
+                        SizedBox
+                        (
+                          width: MediaQuery.of(context).size.width-200,
+                          child: Row
+                          (
+                            children: 
+                            [
+                            /* **************** C H E C K B O X ******************* */
+                              Checkbox
+                              (
+                                value: rememberUser,
+                                onChanged: (value) 
+                                {
+                                  setState(() 
+                                  {
+                                    rememberUser = value!;
+                                  });
+      
+                                  // Save the state of rememberUser to SharedPreferences
+                                  saveRememberUser(value!);
+                                },
+                              ),
+      
+                              const Text
+                              (
+                                "Remember me",
+                                  style: TextStyle(color: Colors.white),
+                              ),
+                            ],
+                          ),
+                        ),
+          
+                        const SizedBox(width: 30),
+          
+                        /* **************** T E X T  B U T T O N : forget password  ******************* */
+                        TextButton
+                        (
+                          onPressed: () 
+                          {
+                            PassForget();
+                          },
+                          child: const Text("I forgot my password",style: TextStyle(color: Colors.white),),
+                        ),
+                      ],
+                    ),
+          
+                      //bgColor: 0xFF080a16
+                      //btn :
+                      //      1/ 0xFF810cf5 *** 2/ 0xFF810cf5 *** 3/ 0xFFa64efc
+      
+                      // box : 0xFF141931
+              
+                    const SizedBox(height: 25),
+                    
+                    /* **************** L O G I N  B U T T O N  ******************* */
+                    MyButton
+                    (
+                      onTap: signUserIn,
+                      textButton: 'L  O  G  I  N ',
+                      hb: 50,
+                      wb: MediaQuery.of(context).size.width,
+                    ),
+          
+                    const SizedBox(height: 15),
+                    
+          
+                    /* **************** O R  B L O C K  ******************* */
+          
+                    Padding
+                    (
+                      padding: EdgeInsets.symmetric(horizontal: 30.0),
+                      
+                      child: SizedBox
+                      (
+                        
+                        width: MediaQuery.of(context).size.width-20,
+      
+                        child: Row
+                        (
+                          children: 
+                          const 
+                          [
+                            Expanded
+                            (
+                              child: Divider
+                              (
+                                thickness: 0.5,
+                                color: Colors.white,
+                              ),
+                            ),
+                            Padding
+                            (
+                              padding: EdgeInsets.symmetric(horizontal: 10.0),
+                              child: Text
+                              (
+                                'Or ',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                            Expanded
+                            (
+                              child: Divider
+                              (
+                                thickness: 0.5,
+                                color: Colors.white,
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+          
+                    const SizedBox(height: 15),
+          
+                    /* **************** R E G I S T E R   B U T T O N ******************* */
+          
+                    MyButton
+                    (
+                      onTap: signUserUp,
+                      textButton: 'R  E  G  I  S  T  E  R ',
+                      hb: 50,
+                      wb: MediaQuery.of(context).size.width,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
