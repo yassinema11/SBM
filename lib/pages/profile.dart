@@ -1,12 +1,10 @@
-// ignore_for_file: prefer_const_constructors, file_names, prefer_const_literals_to_create_immutables, sized_box_for_whitespace, avoid_print, unnecessary_null_comparison, non_constant_identifier_names, unused_local_variable, unused_element, use_build_context_synchronously, unused_label, unused_import, avoid_unnecessary_containers
+// ignore_for_file: prefer_const_constructors, file_names, prefer_const_literals_to_create_immutables, sized_box_for_whitespace, avoid_print, unnecessary_null_comparison, non_constant_identifier_names, unused_local_variable, unused_element, use_build_context_synchronously, unused_label, unused_import, avoid_unnecessary_containers, avoid_types_as_parameter_names
 
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:flutter_profile_picture/flutter_profile_picture.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:quickalert/models/quickalert_type.dart';
-import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Profile extends StatefulWidget 
@@ -52,37 +50,91 @@ class ProfileState extends State<Profile>
     });
   }
   
-  void Logout() async 
+  Future<bool?> showConfirmationDialog(BuildContext context , String title , String msg , IconData icon, Color clr) 
   {
-    QuickAlert.show
-    (
-      context: context,
-      type: QuickAlertType.confirm,
-      text: 'Do you want to logout',
-      title: 'Are you Sure ? ',
-      textColor:Colors.black,
-      titleColor: Colors.white,
-      confirmBtnColor:Colors.green,
-      onConfirmBtnTap: ()
-      async 
+  return showDialog<bool>(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text(title , textAlign: TextAlign.center),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 50,
+              color: clr,
+            ),
+            SizedBox(height: 20),
+            Text(msg),
+          ],
+        ),
+
+        
+        actions: [
+          TextButton(
+            onPressed: () {
+              // Handle cancel action
+              Navigator.of(context).pop(false);
+            },
+            child: Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.redAccent)),
+            onPressed: () {
+                print("hell");              
+                Navigator.of(context).pop(true);
+            },
+            child: Text('Confirm',style: TextStyle(color: Colors.black),),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+      Future<bool?> showstatus(BuildContext context , String title , String msg , IconData icon , Color color) 
+        {
+        return showDialog<bool>
+        (
+          context: context,
+          builder: (BuildContext context) 
+          {
+            return AlertDialog(
+              title: Text(title , textAlign: TextAlign.center),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    icon,
+                    size: 50,
+                    color: color,
+                  ),
+                  SizedBox(height: 20),
+                  Text(msg),
+                ],
+              ),
+            );
+          },
+        );
+      }
+
+      void Logout() async 
       {
+        bool? result = await showConfirmationDialog(context, "Confirmation", "Are you sure you want to Log Out?", Icons.warning, Colors.orange);
+
+        if (result != null && result) 
+        {
+          print('User confirmed');
           SharedPreferences prefs = await SharedPreferences.getInstance();
           await prefs.remove('user');
           Navigator.pushNamed(context, '/loginpage');
-      },
-
-      onCancelBtnTap: () 
-      {
-        Navigator.pop(context);
-      },
-
-      confirmBtnText: 'Yes',
-      cancelBtnText: 'No',
-    );
-
-  
-  }
-
+        } 
+        else 
+        {
+          print('User canceled');
+        }
+      }
 
   String cryptageData(String input) 
   {
@@ -350,6 +402,7 @@ class ProfileState extends State<Profile>
                 if (response.statusCode == 200) 
                 {
                   setState(() 
+                  async 
                   {
                     name = newName;
                     mail = newMail;
@@ -358,13 +411,8 @@ class ProfileState extends State<Profile>
 
                     print("User data Updated Successfully . . .");
 
-                    QuickAlert.show
-                    (
-                      context: context,
-                      type: QuickAlertType.success,
-                      text: 'Updated Successfully!',
-                      disableBackBtn: false,
-                    );
+                    await showstatus(context, "Success", "Updated Succesfully", Icons.warning, Colors.orange);
+
                   });
 
                   Future.delayed(Duration(seconds: 1), () 

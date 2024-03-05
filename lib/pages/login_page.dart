@@ -1,7 +1,6 @@
 // ignore_for_file: library_private_types_in_public_api, avoid_print, non_constant_identifier_names, unused_import, unused_local_variable, use_build_context_synchronously, unused_element, prefer_const_constructors, sized_box_for_whitespace
 
 import 'package:flutter/material.dart';
-import 'package:quickalert/quickalert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:temp1/components/my_button.dart';
 import 'package:http/http.dart' as http;
@@ -119,14 +118,7 @@ class LoginPageState extends State<LoginPage>
 
   if(userEmail.isEmpty && userPassword.isEmpty)
   {
-    QuickAlert.show
-    (
-      context: context,
-      type: QuickAlertType.error,
-      textColor:Colors.white,
-      text: 'Please add your email and password',
-      backgroundColor: Colors.black,
-    );
+    await showstatus(context, "Warning", "Fields are required ", Icons.warning, Colors.red);
     return;
   }
 
@@ -180,14 +172,7 @@ class LoginPageState extends State<LoginPage>
         saveUserData(userEmail,passwordCrypted,UserId);
         print('id:  $userID');
 
-        QuickAlert.show
-        (
-          context: context,
-          type: QuickAlertType.success,
-          text: 'Welcome . . . ',
-          showConfirmBtn:false,	
-          backgroundColor: Colors.black,
-        );
+        await showstatus(context, "Success", "Hello User", Icons.check_circle, Colors.green);
 
         Future.delayed(Duration(seconds: 1), () 
         {
@@ -203,16 +188,8 @@ class LoginPageState extends State<LoginPage>
       {
         debugPrint('User not found or password incorrect');
         
-        QuickAlert.show
-        (
-          context: context,
-          type: QuickAlertType.error,
-          title: 'Oops...',
-          textColor:Colors.white,
-          titleColor: Colors.white,
-          text: 'Check your user or password',
-          backgroundColor: Colors.black,
-        );
+       await showstatus(context, "Warning", "User not found or password incorrect", Icons.warning, Colors.red);
+
       }
     } 
     catch (e) 
@@ -352,7 +329,31 @@ class LoginPageState extends State<LoginPage>
       },
     );
   }
-
+      Future<bool?> showstatus(BuildContext context , String title , String msg , IconData icon , Color color) 
+        {
+        return showDialog<bool>
+        (
+          context: context,
+          builder: (BuildContext context) 
+          {
+            return AlertDialog(
+              title: Text(title , textAlign: TextAlign.center),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    icon,
+                    size: 50,
+                    color: color,
+                  ),
+                  SizedBox(height: 20),
+                  Text(msg),
+                ],
+              ),
+            );
+          },
+        );
+      }
 
   @override
   Widget build(BuildContext context) 

@@ -1,7 +1,8 @@
-// ignore_for_file: avoid_print, unused_local_variable, non_constant_identifier_names, deprecated_member_use, unused_import, file_names, avoid_unnecessary_containers, use_build_context_synchronously, unnecessary_const, prefer_const_constructors, prefer_adjacent_string_concatenation, unused_element, unnecessary_type_check, unnecessary_null_comparison, sized_box_for_whitespace, unnecessary_string_interpolations, prefer_interpolation_to_compose_strings
+// ignore_for_file: avoid_print, unused_local_variable, non_constant_identifier_names, deprecated_member_use, unused_import, file_names, avoid_unnecessary_containers, use_build_context_synchronously, unnecessary_const, prefer_const_constructors, prefer_adjacent_string_concatenation, unused_element, unnecessary_type_check, unnecessary_null_comparison, sized_box_for_whitespace, unnecessary_string_interpolations, prefer_interpolation_to_compose_strings, prefer_const_literals_to_create_immutables
 
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:beacon_broadcast/beacon_broadcast.dart';
@@ -26,6 +27,9 @@ class HomeState extends State<Home>
   BeaconBroadcast beaconBroadcast = BeaconBroadcast();
   String selectedLanguage = 'English';
   bool isDarkMode = true;
+  TextEditingController dur = TextEditingController();
+  String str = "abc";
+
 
   @override
   void initState() 
@@ -98,7 +102,7 @@ class HomeState extends State<Home>
 
         bool isValid = isValidUUID(uuid);
 
-        if (!isValid) 
+        if (isValid) 
         {
           try 
           {
@@ -107,7 +111,7 @@ class HomeState extends State<Home>
                 .setMajorId(1)
                 .setMinorId(100)
                 .start();
-
+                          
             print('--------------------------------BLE Signal Advertised --------------------------------------');
 
             ScaffoldMessenger.of(context).showSnackBar
@@ -126,7 +130,17 @@ class HomeState extends State<Home>
                 content: Text(' Barrier Opened '),
                 duration: const Duration(seconds: 2),
               ),
-            );    
+            ); 
+
+                 await Future.delayed(Duration(seconds: 2));
+      
+
+            beaconBroadcast
+              .setUUID(uuid)
+              .stop();
+
+            print('--------------------------------BLE Signal Stopped --------------------------------------');
+
           } 
           catch (e) 
           {
@@ -148,7 +162,6 @@ class HomeState extends State<Home>
       print('ID not found in SharedPreferences');
     }
   }
-
   /*Future<void> OpenGate() async 
   {
 
@@ -209,6 +222,7 @@ class HomeState extends State<Home>
     });
   }
 
+  
 
   @override
   Widget build(BuildContext context) 
@@ -249,6 +263,19 @@ class HomeState extends State<Home>
               backgroundColor: isDarkMode ? const Color(0xFF080a16) : Colors.white,
               centerTitle: true,
             ),
+            
+            Container(
+              width: screenWidth-150,
+              color: Colors.white,
+              child: TextField(
+                controller: dur,
+                 keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: 'wa9t',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ),
       
             const SizedBox(height: 20),
       
@@ -256,7 +283,7 @@ class HomeState extends State<Home>
             (
               child: Container
               (
-                width: 300,
+                width: screenWidth-120,
                 height: 60,
                 decoration: BoxDecoration
                 (
@@ -410,6 +437,8 @@ class HomeState extends State<Home>
               ),
             ),
             const SizedBox(height: 30),
+
+            
           ],
         ),
       ),

@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously, prefer_const_constructors, unused_element, avoid_print, unused_local_variable, avoid_unnecessary_containers, sized_box_for_whitespace
+// ignore_for_file: use_build_context_synchronously, prefer_const_constructors, unused_element, avoid_print, unused_local_variable, avoid_unnecessary_containers, sized_box_for_whitespace, dead_code
 
 import 'package:flutter/material.dart';
 import 'package:screen_brightness/screen_brightness.dart';
@@ -64,6 +64,35 @@ class _SettingsState extends State<Settings>
       throw 'Failed to set brightness';
     }
   }
+
+  Future<bool?> showstatus(BuildContext context , String title , String msg , IconData icon , Color color) 
+        async {
+        return showDialog<bool>
+        (
+          context: context,
+          builder: (BuildContext context) 
+          {
+            return AlertDialog(
+              title: Text(title , textAlign: TextAlign.center),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    icon,
+                    size: 50,
+                    color: color,
+                  ),
+                  SizedBox(height: 20),
+                  Text(msg),
+                ],
+              ),
+            );
+          },
+        );
+
+      await Future.delayed(Duration(seconds: 2));
+      Navigator.of(context).pop();
+      }
 
 
   @override
@@ -213,7 +242,8 @@ class _SettingsState extends State<Settings>
               (
                 child: ElevatedButton
                 (
-                  onPressed: saveSettings,
+                  onPressed: () async => await showstatus(context, "Success", " Saved Successfully", Icons.done, Colors.green),
+
                   style: ElevatedButton.styleFrom(backgroundColor: isDarkMode ? Colors.white : Colors.black),
                   child: 
                     Text

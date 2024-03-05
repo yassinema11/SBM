@@ -1,8 +1,6 @@
 // ignore_for_file: library_private_types_in_public_api, avoid_print, unused_local_variable, unused_label, unused_import, non_constant_identifier_names, use_build_context_synchronously, prefer_const_constructors, sized_box_for_whitespace
 
 import 'package:flutter/material.dart';
-import 'package:quickalert/models/quickalert_type.dart';
-import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:temp1/components/my_button.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -164,6 +162,12 @@ void signUserUp() async
     return;
   }
 
+  if(userEmail.isEmpty && userPassword.isEmpty && userPhoneNumber.isEmpty)
+  {
+    await showstatus(context, "Warning", "Fields are required ", Icons.warning, Colors.red);
+    return;
+  }
+
   var signUpUrl = Uri.parse('http://$server:$port/signup');
 
   try 
@@ -189,13 +193,8 @@ void signUserUp() async
     {
       print('User sign-up successful');
 
-      QuickAlert.show
-      (
-        context: context,
-        type: QuickAlertType.success,
-        text: 'Registered Successfully!',
-        showConfirmBtn:false,	
-      );
+      await showstatus(context, "Success", "Sign-up Succesfully", Icons.check_circle_rounded, Colors.green);
+
 
       Future.delayed(Duration(seconds: 3), () 
       {
@@ -214,6 +213,8 @@ void signUserUp() async
 
     else 
     {
+      await showstatus(context, "Failed", "Sign up Failed ${response.statusCode}", Icons.check_circle_rounded, Colors.green);
+
       debugPrint('User sign-up failed with status (user already exist): ${response.statusCode}');
     }
   } 
@@ -230,6 +231,31 @@ void signUserUp() async
     Navigator.pushNamed(context, '/loginpage');
   }
 
+        Future<bool?> showstatus(BuildContext context , String title , String msg , IconData icon , Color color) 
+        {
+        return showDialog<bool>
+        (
+          context: context,
+          builder: (BuildContext context) 
+          {
+            return AlertDialog(
+              title: Text(title , textAlign: TextAlign.center),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    icon,
+                    size: 50,
+                    color: color,
+                  ),
+                  SizedBox(height: 20),
+                  Text(msg),
+                ],
+              ),
+            );
+          },
+        );
+      }
 
   @override
   Widget build(BuildContext context) 
