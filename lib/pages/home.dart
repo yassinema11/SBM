@@ -7,8 +7,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:beacon_broadcast/beacon_broadcast.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
-import 'package:quickalert/models/quickalert_type.dart';
-import 'package:quickalert/widgets/quickalert_dialog.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Home extends StatefulWidget 
@@ -27,8 +26,6 @@ class HomeState extends State<Home>
   BeaconBroadcast beaconBroadcast = BeaconBroadcast();
   String selectedLanguage = 'English';
   bool isDarkMode = true;
-  TextEditingController dur = TextEditingController();
-  String str = "abc";
 
 
   @override
@@ -37,6 +34,56 @@ class HomeState extends State<Home>
     super.initState();
     BltStat();
     loadSet();
+    requestPermissions();
+  }
+
+    void showAlertDialog(BuildContext context) {
+      showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Permission Denied'),
+            content: Text('Allow access to gallery and photos'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () {
+                  print('Settings');
+                  Navigator.of(context).pop();
+                },
+                child: Text('Settings'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+
+
+    void requestPermissions() async {
+    bool permGranted = false;
+
+    // Request permissions
+    var statuses = await [
+      Permission.location,
+      Permission.bluetoothAdvertise,
+    ].request();
+
+    // Check if all permissions are granted
+    if (statuses[Permission.location]!.isGranted &&
+        statuses[Permission.bluetoothAdvertise]!.isGranted ) {
+      permGranted = true;
+    }
+    else
+    {
+      print('Access Denied');
+      showAlertDialog(context);
+    }
+       print('Permissions granted: $permGranted');
   }
 
   Future<void> BltStat() async 
@@ -264,21 +311,7 @@ class HomeState extends State<Home>
               centerTitle: true,
             ),
             
-            Container(
-              width: screenWidth-150,
-              color: Colors.white,
-              child: TextField(
-                controller: dur,
-                 keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: 'wa9t',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-            ),
-      
-            const SizedBox(height: 20),
-      
+      const SizedBox(height: 30),
             Center
             (
               child: Container

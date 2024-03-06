@@ -90,7 +90,6 @@ class _SettingsState extends State<Settings>
           },
         );
 
-      await Future.delayed(Duration(seconds: 2));
       Navigator.of(context).pop();
       }
 
