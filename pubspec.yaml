@@ -42,13 +42,13 @@ dependencies:
   curved_navigation_bar: ^1.0.3
   flutter_blue_plus: ^1.31.13
   image_picker: ^1.0.7
-  quickalert: ^1.0.2  
   flutter_profile_picture: ^2.0.0
   beacon_broadcast: ^0.3.1
   screen_brightness: ^1.0.0
   flutter_localization: ^0.2.0
   permission_handler: ^11.3.0
-
+  google_maps_flutter: ^2.6.0
+  geolocator: ^11.0.0
 
 
 dev_dependencies:
@@ -76,6 +76,8 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
       - images/
+      - assets/images/
+
   #   - lib/assets/images/logo_google.png
 
   # An image asset can refer to one or more resolution-specific "variants", see

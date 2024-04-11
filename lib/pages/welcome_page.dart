@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:temp1/pages/home.dart';
+import 'package:temp1/pages/maps.dart';
 import 'package:temp1/pages/profile.dart';
 import 'package:temp1/pages/settings.dart';
 
@@ -22,9 +23,9 @@ class WelcomePageState extends State<WelcomePage>
 {
     final items = 
     [
-      Icon(Icons.person, size: 25),
+      Icon(Icons.person, size: 30),
       Icon(Icons.home, size: 25),
-      Icon(Icons.settings, size: 25),
+      Icon(Icons.share_location, size: 30),
     ];
 
     int index = 1;

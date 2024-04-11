@@ -141,69 +141,59 @@ class ProfileState extends State<Profile>
     return md5.convert(utf8.encode(input)).toString();
   }
   
-  Future<void> ProfileData() async 
-  {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  String? Em = prefs.getString('user');
 
-  try 
-  {
-    if (Em == null) 
-    {
+Future<void> ProfileData() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? userEmail = prefs.getString('user');
+  print('User email: $userEmail');
+
+  try {
+    if (userEmail == null) {
       print('User email is null');
       return;
     }
 
     String server = prefs.getString('server') ?? '192.168.178.16';
     String port = prefs.getString('port') ?? '5000';
-    final userUrl = 'http://$server:$port/user?email=$Em';
+    final userUrl = 'http://$server:$port/user/$userEmail';
 
-    final response = await http.get
-    (
-      Uri.parse(userUrl),
-      headers: <String, String>
-      {
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-    );
+    final response = await http.get(Uri.parse(userUrl), headers: {
+      'Content-Type': 'application/json; charset=UTF-8',
+    });
 
-    if (response.statusCode == 200) 
-    {
-      final userData = jsonDecode(response.body);
+    if (response.statusCode == 200) {
+      final jsonResponse = jsonDecode(response.body);
 
-      setState(() 
-      {
-        name = userData['name'] ?? '';
-        mail = userData['email'] ?? '';
-        phone = userData['phone'] ?? '';
-        curpas = userData['password'] ?? '';
+      // Access the nested 'user' object
+      var userData = jsonResponse['user'];
 
-        dynamic lpnsData = userData['lpns'] ?? [];
-        lpns = [];
+      // Update state variables with user data
+      setState(() {
+        name = userData['name'] ?? 'Name not available';
+        mail = userData['email'] ?? 'Email not available';
+        phone = userData['phone_number'] ?? 'Phone number not available';
+        String pass = userData['password'] ?? 'Password not available';
+        print(pass);
 
-        if (lpnsData is List) 
-        {
-          for (int i = 0; i < lpnsData.length; i++) 
-          {
-            lpns.add({'plateNumber': lpnsData[i], 'index': i});
-          }
-        } 
-        else 
-        {
-          print('lpnsData is not a List');
-        }
+        prefs.setString('cps',pass);
+        
+        //lpn1 = userData['lpn1'] ?? 'LPN1 not available';
+        //lpn2 = userData['lpn2'] ?? 'LPN2 not available';
+        //lpn3 = userData['lpn3'] ?? 'LPN3 not available';
+        //lpn4 = userData['lpn4'] ?? 'LPN4 not available';
       });
-    } 
-    else 
-    {
+    } else {
       print("Failed to load user data: ${response.statusCode}");
+      // Handle error cases
+      // You can show an error message to the user or retry the request
     }
-  } 
-  catch (e) 
-  {
+  } catch (e) {
     print('Error fetching user data: $e');
+    // Handle exceptions
+    // You can show an error message to the user or retry the request
   }
 }
+
 
   Future<void> showUpdateUserDialog() async 
   {
@@ -368,13 +358,8 @@ class ProfileState extends State<Profile>
               onPressed: () async 
               {
                 SharedPreferences prefs = await SharedPreferences.getInstance();
-                String actualStoredPassword = prefs.getString('password') ?? '';
+                String? actualStoredPassword = prefs.getString('cps');
                 
-                if (actualPassword != actualStoredPassword) 
-                {
-                  print('Current password is incorrect');
-                  return;
-                }
 
                 String hashedNewPassword = cryptageData(newPassword);
 
@@ -382,7 +367,8 @@ class ProfileState extends State<Profile>
                 String server = prefs.getString('server') ?? '192.168.178.16';
                 String port = prefs.getString('port') ?? '5000';
 
-                final userUrl = 'http://$server:$port/user?email=$mail';
+                final userUrl = 'http://$server:$port/modify/$mail';
+                
                 final response = await http.put
                 (
                   Uri.parse(userUrl),

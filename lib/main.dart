@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:temp1/pages/login_page.dart';
 import 'package:temp1/pages/Home.dart';
 import 'package:temp1/pages/forgot_password.dart';
+import 'package:temp1/pages/maps.dart';
 import 'package:temp1/pages/profile.dart';
 import 'package:temp1/pages/register_page.dart';
 import 'package:temp1/pages/settings.dart';
@@ -31,8 +32,8 @@ class MyApp extends StatelessWidget
 
       theme: ThemeData
       (
-        // Define your theme here
-// Example:
+          // Define your theme here
+          // Example:
           // primaryColor: Colors.blue,
           // accentColor: Colors.green,
       ),
@@ -45,6 +46,7 @@ class MyApp extends StatelessWidget
         '/forgotpassword': (context) => const ForgotPassword(),
         '/profile': (context) => const Profile(),
         '/home': (context) => const Home(),
+        '/maps': (context) => const Maps(),
         '/settings': (context) => const Settings(),
       },
 
