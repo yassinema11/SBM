@@ -25,7 +25,7 @@ class ProfileState extends State<Profile>
   late String phone = "Phone";
   late String curpas = "Current Password";
   late String newpas = "New Password";
-  late List<Map<String, dynamic>> lpns = [];
+  late List<dynamic> lpns = []; // List to store license plate numbers
   String selectedLanguage = 'English';
   bool isDarkMode = true;
 
@@ -171,16 +171,22 @@ Future<void> ProfileData() async {
       setState(() {
         name = userData['name'] ?? 'Name not available';
         mail = userData['email'] ?? 'Email not available';
-        phone = userData['phone_number'] ?? 'Phone number not available';
+        phone = userData['phoneNumber'] ?? 'Phone number not available';
         String pass = userData['password'] ?? 'Password not available';
+        
+        lpns = [
+          userData['lpn1'] ?? '',
+          userData['lpn2'] ?? '',
+          userData['lpn3'] ?? '',
+          userData['lpn4'] ?? '',
+        ].where((lpn) => lpn.isNotEmpty).toList();
+      
+          print(userData['lpn1']);
+
         print(pass);
 
         prefs.setString('cps',pass);
         
-        //lpn1 = userData['lpn1'] ?? 'LPN1 not available';
-        //lpn2 = userData['lpn2'] ?? 'LPN2 not available';
-        //lpn3 = userData['lpn3'] ?? 'LPN3 not available';
-        //lpn4 = userData['lpn4'] ?? 'LPN4 not available';
       });
     } else {
       print("Failed to load user data: ${response.statusCode}");
@@ -361,13 +367,11 @@ Future<void> ProfileData() async {
                 String? actualStoredPassword = prefs.getString('cps');
                 
 
-                String hashedNewPassword = cryptageData(newPassword);
-
                 // Save the updated data to the database
                 String server = prefs.getString('server') ?? '192.168.178.16';
                 String port = prefs.getString('port') ?? '5000';
 
-                final userUrl = 'http://$server:$port/modify/$mail';
+                final userUrl = 'http://$server:$port/modifyUser/$mail';
                 
                 final response = await http.put
                 (
@@ -380,26 +384,21 @@ Future<void> ProfileData() async {
                   {
                     'name': newName,
                     'email': newMail,
-                    'phone': newPhone,
-                    'password': hashedNewPassword,
+                    'phone_number': newPhone,
+                    'password': newPassword,
                   }),
                 );
 
                 if (response.statusCode == 200) 
                 {
-                  setState(() 
-                  async 
-                  {
                     name = newName;
                     mail = newMail;
                     phone = newPhone;
 
-
                     print("User data Updated Successfully . . .");
 
-                    await showstatus(context, "Success", "Updated Succesfully", Icons.warning, Colors.orange);
+                    await showstatus(context, "Success", "Updated Succesfully", Icons.done, Colors.green);
 
-                  });
 
                   Future.delayed(Duration(seconds: 1), () 
                   {           
@@ -527,7 +526,7 @@ Future<void> ProfileData() async {
                             ),
                           ),
                         
-                      const SizedBox(height:20),
+             const SizedBox(height:75),
                             
                       Center
                       (
@@ -578,7 +577,7 @@ Future<void> ProfileData() async {
                           ),
                         ),
                             
-                      const SizedBox(height:20),
+             const SizedBox(height:20),
                             
                       Center
                       (
@@ -589,7 +588,7 @@ Future<void> ProfileData() async {
                           decoration: BoxDecoration
                           (
                              color: isDarkMode ? Colors.white : Colors.black,
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(15),
                           ),
                       
                           child: Row
@@ -629,7 +628,7 @@ Future<void> ProfileData() async {
                           decoration: BoxDecoration
                           (
                             color: isDarkMode ? Colors.white : Colors.black,
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(15),
                           ),
                       
                           child: Row
@@ -649,7 +648,7 @@ Future<void> ProfileData() async {
                                 style: TextStyle
                                 (
                                   color: isDarkMode ? Colors.black : Colors.white,
-                                  fontSize: 22,
+                                  fontSize: 20,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -658,64 +657,44 @@ Future<void> ProfileData() async {
                         ),
                       ),
                             
-                            
-                      Center
-                      (
-                        child: Align
-                        (
-                          alignment: Alignment.topCenter,
-                          child: Container
-                          (
-                            height: 300,
-                            width: 350,
-                            child: ListView.builder
-                            (
-                              itemCount: lpns.length,
-                              itemBuilder: (BuildContext context, int index) 
-                              {
-                                return Container
-                                (
-                                  width: 350,
-                                  height: 40,
-                                  margin: EdgeInsets.symmetric(vertical: 3),
-                                  decoration: BoxDecoration
-                                  (
-                                    color: isDarkMode ? Colors.white : Colors.black,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                
-                                  child: Row
-                                  (
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: 
-                                    [
-                                      SizedBox(width: 15),
-                                      Icon
-                                      (
-                                        Icons.directions_car_filled,
-                                        color: isDarkMode ? Color(0xFF5e3b91) : Color.fromARGB(255, 213, 190, 252),
-                                      ),
-                                      
-                                      SizedBox(width: 10),
-                
-                                      Text
-                                      (
-                                        lpns[index]['plateNumber'] ?? '',
-                                        style: TextStyle
-                                        (
-                                          color: isDarkMode ? Colors.black : Colors.white,
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
+                           const SizedBox(height:10),
+               
+          if (lpns.isNotEmpty)
+            Column(
+              children: lpns
+                  .map(
+                    (lpn) => Container(
+                      width: 350,
+                      height: 40,
+                      margin: EdgeInsets.symmetric(vertical: 10),
+                      decoration: BoxDecoration(
+                        color: isDarkMode ? Colors.white : Colors.black,
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          SizedBox(width: 15),
+                          Icon(
+                            Icons.directions_car_filled,
+                            color: isDarkMode ? Color(0xFF5e3b91) : Color.fromARGB(255, 213, 190, 252),
+                          ),
+                          SizedBox(width: 10),
+                          Text(
+                            lpn,
+                            style: TextStyle(
+                              color: isDarkMode ? Colors.black : Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              
                             ),
                           ),
-                        ),
+                        ],
                       ),
+                    ),
+                  )
+                  .toList(),
+            ),
                             
                       /*Center
                       (
@@ -764,7 +743,7 @@ Future<void> ProfileData() async {
                       ),*/  
                     ],
                   ),
-        ),
+                ),
               ),
     );
   }

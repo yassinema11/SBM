@@ -113,11 +113,11 @@ class LoginPageState extends State<LoginPage>
   String userEmail = emailController.text;
   String userPassword = passwordController.text;
   String userID = '0';
-  String UserId = 'aaa';
+  String UserId = '0';
 
-  debugPrint("Hello");
+  debugPrint("Hello : \n mail : $userEmail, \t password : $userPassword");
 
-  if(userEmail.isEmpty && userPassword.isEmpty)
+  if(userEmail.isEmpty || userPassword.isEmpty)
   {
     await showstatus(context, "Warning", "Fields are required ", Icons.warning, Colors.red);
     return;
@@ -131,8 +131,8 @@ class LoginPageState extends State<LoginPage>
     try 
     {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      String server = prefs.getString('server') ?? '192.168.178.16';
-      String port = prefs.getString('port') ?? '5000';
+      String server = prefs.getString('server') ?? '0.0.0.0';
+      String port = prefs.getString('port') ?? '8200';
 
       if (server.isEmpty || port.isEmpty) 
       {
@@ -154,7 +154,7 @@ class LoginPageState extends State<LoginPage>
           {
             '_id': userID,
             'email': userEmail, 
-            'password': userPassword,
+            'password': passwordCrypted,
           },
         ),
       );
@@ -173,23 +173,20 @@ class LoginPageState extends State<LoginPage>
         saveUserData(userEmail,passwordCrypted,UserId);
         print('id:  $userID');
 
-        await showstatus(context, "Success", "Hello User", Icons.check_circle, Colors.green);
+        await showstatus(context, "Success", "Welcome $userEmail", Icons.check_circle, Colors.green);
 
-        Future.delayed(Duration(seconds: 1), () 
-        {
           Navigator.pushNamed
           (
             context,
             '/welcomepage',
           );
-        });
 
       } 
       else 
       {
         debugPrint('User not found or password incorrect');
         
-       await showstatus(context, "Warning", "User not found or password incorrect", Icons.warning, Colors.red);
+       await showstatus(context, "Error", "User not found or password incorrect", Icons.warning, Colors.red);
 
       }
     } 
@@ -216,7 +213,7 @@ class LoginPageState extends State<LoginPage>
   }
 
 
-  /* **************** Password forget  F U N C T I O N ******************* */
+/*   /* **************** Password forget  F U N C T I O N ******************* */
   void PassForget() 
   {
     String userEmail = emailController.text;
@@ -230,7 +227,7 @@ class LoginPageState extends State<LoginPage>
         'email': userEmail,
       },
     );
-  }
+  } */
 
   void SettingsLogin() 
   {
@@ -341,7 +338,8 @@ class LoginPageState extends State<LoginPage>
               title: Text(title , textAlign: TextAlign.center),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
-                children: [
+                children: 
+                [
                   Icon(
                     icon,
                     size: 50,
@@ -441,7 +439,7 @@ class LoginPageState extends State<LoginPage>
           
                   const SizedBox(height: 40),
                     
-                    /* **************** T E X T : WELCOME BACK ******************* */
+              /* **************** T E X T : WELCOME BACK ******************* */
           
                     const Text
                     (
@@ -452,7 +450,7 @@ class LoginPageState extends State<LoginPage>
                     const SizedBox(height: 20),
           
           
-                  /* **************** F I E L D : EMAIL ******************* */
+              /* **************** F I E L D : EMAIL ******************* */
                     SizedBox
                     (
                       height: 70,
@@ -565,14 +563,17 @@ class LoginPageState extends State<LoginPage>
                     ),
           
                     const SizedBox(height: 10),
+
           
             /* **************** R A W  ******************* */
                     Row
                     (
                       mainAxisAlignment: MainAxisAlignment.center,
-      
+
                       children: 
                       [
+                        const SizedBox(width: 30),
+
                         SizedBox
                         (
                           width: MediaQuery.of(context).size.width-200,
@@ -605,9 +606,8 @@ class LoginPageState extends State<LoginPage>
                           ),
                         ),
           
-                        const SizedBox(width: 30),
           
-                        /* **************** T E X T  B U T T O N : forget password  ******************* */
+                      /* /* **************** T E X T  B U T T O N : forget password  ******************* */
                         TextButton
                         (
                           onPressed: () 
@@ -615,7 +615,7 @@ class LoginPageState extends State<LoginPage>
                             PassForget();
                           },
                           child: const Text("I forgot my password",style: TextStyle(color: Colors.white),),
-                        ),
+                        ), */
                       ],
                     ),
           
@@ -631,7 +631,7 @@ class LoginPageState extends State<LoginPage>
                     MyButton
                     (
                       onTap: signUserIn,
-                      textButton: 'L  O  G  I  N ',
+                      textButton: 'L O G I N ',
                       hb: 50,
                       wb: MediaQuery.of(context).size.width,
                     ),
@@ -692,7 +692,7 @@ class LoginPageState extends State<LoginPage>
                     MyButton
                     (
                       onTap: signUserUp,
-                      textButton: 'R  E  G  I  S  T  E  R ',
+                      textButton: 'R E G I S T E R ',
                       hb: 50,
                       wb: MediaQuery.of(context).size.width,
                     ),

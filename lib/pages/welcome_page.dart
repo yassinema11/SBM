@@ -21,17 +21,17 @@ class WelcomePage extends StatefulWidget
 
 class WelcomePageState extends State<WelcomePage> 
 {
-    final items = 
-    [
-      Icon(Icons.person, size: 30),
-      Icon(Icons.home, size: 25),
-      Icon(Icons.share_location, size: 30),
-    ];
+  final items = 
+  [
+    Icon(Icons.person, size: 30),
+    Icon(Icons.home, size: 25),
+    Icon(Icons.local_parking_rounded, size: 30),
+  ];
 
-    int index = 1;
-    String selectedLanguage = 'English';
+  int index = 1;
+  String selectedLanguage = 'English';
 
-    bool isDarkMode = true;
+  bool isDarkMode = true;
 
   Future<void> loadSet() async 
   {

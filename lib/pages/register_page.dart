@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api, avoid_print, unused_local_variable, unused_label, unused_import, non_constant_identifier_names, use_build_context_synchronously, prefer_const_constructors, sized_box_for_whitespace
+// ignore_for_file: library_private_types_in_public_api, avoid_print, unused_local_variable, unused_label, unused_import, non_constant_identifier_names, use_build_context_synchronously, prefer_const_constructors, sized_box_for_whitespace, prefer_interpolation_to_compose_strings, avoid_unnecessary_containers
 
 import 'package:flutter/material.dart';
 import 'package:temp1/components/my_button.dart';
@@ -19,12 +19,23 @@ class RegisterPage extends StatefulWidget
 class RegisterPageState extends State<RegisterPage> 
 {
   final GlobalKey<FormState> form = GlobalKey<FormState>();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController phoneController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confpasswordController = TextEditingController();
-  TextEditingController serverController = TextEditingController();
-  TextEditingController portController = TextEditingController();
+
+  // data to add // 
+  final TextEditingController emailController = TextEditingController(); // ok
+  final TextEditingController phoneController = TextEditingController(); // ok 
+
+  final TextEditingController passwordController = TextEditingController(); // ok 
+  final TextEditingController confpasswordController = TextEditingController(); // ok 
+
+  final TextEditingController nameController = TextEditingController(); //ok
+
+  final TextEditingController lpn1Controller = TextEditingController(); //ok
+  final TextEditingController lpn2Controller = TextEditingController(); //ok
+  // * * * * * * //
+
+
+  TextEditingController serverController = TextEditingController(); // ok
+  TextEditingController portController = TextEditingController(); //ok
 
   bool isObscureP = true;
   bool isObscureCP = true;
@@ -41,7 +52,6 @@ class RegisterPageState extends State<RegisterPage>
   {
     return md5.convert(utf8.encode(input)).toString();
   }
-
 
 
   /* **************** Network  F U N C T I O N ******************* */
@@ -114,7 +124,7 @@ class RegisterPageState extends State<RegisterPage>
             ],
           ),
 
-          backgroundColor: Colors.white,
+          backgroundColor: Colors.black,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
 
           actions: <Widget>
@@ -150,11 +160,17 @@ void signUserUp() async
   String userPassword = passwordController.text;
   String userPhoneNumber = phoneController.text;
 
+  String name = nameController.text;
+
+  String lpn1 = lpn1Controller.text;
+  String lpn2 = lpn2Controller.text;
+
   String passwordCrypted = cryptageData(userPassword);
 
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  String server = prefs.getString('server') ?? '192.168.178.16';
-  String port = prefs.getString('port') ?? '5000';
+  String server = prefs.getString('server') ?? '127.0.0.1';
+  String port = prefs.getString('port') ?? '8100';
+  String reg = "addGuest";
 
   if (server.isEmpty || port.isEmpty) 
   {
@@ -162,38 +178,44 @@ void signUserUp() async
     return;
   }
 
-  if(userEmail.isEmpty && userPassword.isEmpty && userPhoneNumber.isEmpty)
+  if(userEmail.isEmpty || userPassword.isEmpty || lpn1.isEmpty || userPhoneNumber.isEmpty || name.isEmpty)
   {
-    await showstatus(context, "Warning", "Fields are required ", Icons.warning, Colors.red);
+    await showStatus(context, "Warning", "All fields are required ", Icons.warning, Colors.red, Duration(seconds: 2));
     return;
   }
 
-  var signUpUrl = Uri.parse('http://$server:$port/signup');
 
-  try 
+  String signUpUrl = 'http://$server:$port/$reg';
+
+  //Map to add data
+  Map<String, dynamic> userData = 
   {
-    var response = await http.post
-    (
-      signUpUrl,
-      headers: 
-      {
-        'Content-Type': 'application/json'
-      },
-      body: jsonEncode
-      (
-        {
-          'email': userEmail,
-          'password': userPassword,
-          'phone': userPhoneNumber,
-        } 
-      ),
+    "email": userEmail,
+    "name": name,
+    "password": passwordCrypted,
+    "phoneNumber": userPhoneNumber,
+    "lpn1": lpn1,
+    "lpn2": lpn2
+  };
+
+  // Encode the userData map to JSON format
+  String jsonBody = jsonEncode(userData);
+  print(jsonBody);
+
+  // Send POST request using http package
+  try {
+    var response = await http.post(
+      Uri.parse(signUpUrl),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonBody,
+      
     );
 
     if (response.statusCode == 200 || response.statusCode == 201) 
     {
       print('User sign-up successful');
 
-      await showstatus(context, "Success", "Sign-up Succesfully", Icons.check_circle_rounded, Colors.green);
+      await showStatus(context, "Registred Successfully", "Wait the admin to approuve your account", Icons.check_circle_rounded, Colors.green, Duration(seconds: 2));
 
 
       Future.delayed(Duration(seconds: 3), () 
@@ -213,8 +235,7 @@ void signUserUp() async
 
     else 
     {
-      await showstatus(context, "Failed", "Sign up Failed ${response.statusCode}", Icons.check_circle_rounded, Colors.green);
-
+      await showStatus(context, "Failed", "Sign up Failed user already exist", Icons.dangerous, Colors.red, Duration(seconds: 4));
       debugPrint('User sign-up failed with status (user already exist): ${response.statusCode}');
     }
   } 
@@ -224,38 +245,44 @@ void signUserUp() async
   }
 }
 
-    /* **************** L O G I N   F U N C T I O N ******************* */
+  /* **************** Redirect to L O G I N   F U N C T I O N ******************* */
 
   void signUserIn() 
   {
     Navigator.pushNamed(context, '/loginpage');
   }
 
-        Future<bool?> showstatus(BuildContext context , String title , String msg , IconData icon , Color color) 
-        {
-        return showDialog<bool>
-        (
-          context: context,
-          builder: (BuildContext context) 
-          {
-            return AlertDialog(
-              title: Text(title , textAlign: TextAlign.center),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    icon,
-                    size: 50,
-                    color: color,
-                  ),
-                  SizedBox(height: 20),
-                  Text(msg),
-                ],
+  Future<bool?> showStatus(BuildContext context, String title, String msg, IconData icon, Color color, Duration delay) async 
+  {
+    // Show the dialog
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title, textAlign: TextAlign.center),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                size: 50,
+                color: color,
               ),
-            );
-          },
+              SizedBox(height: 20),
+              Text(msg),
+            ],
+          ),
         );
-      }
+      },
+    );
+
+    if (result != null) {
+      await Future.delayed(delay);
+    }
+
+    // Return the result
+    return result;
+  }
 
   @override
   Widget build(BuildContext context) 
@@ -305,51 +332,72 @@ void signUserUp() async
                     ),
           
           
-                    const SizedBox(height: 20),
-          
-          
-           /* **************** L O G O : S B M  ******************* */
-          
-                    Container
+          /* **************** T E X T : Register to Know more ******************* */
+                  
+                    Text
                     (
-                        width: screenWidth-100,
-                        height: 120,
-                        decoration: BoxDecoration
-                        (
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(15),
-                        ),
+                      "Register as a Guest",
+                      style: TextStyle(color: Colors.white, fontSize: 25),
+                    ),
           
-                      child: Center
+                    const SizedBox(height: 30),
+
+
+                    SizedBox
+                    (
+                      height: 50,
+                      width: screenWidth/1.2,
+                      child: TextFormField
                       (
-                        /* **************** L O G O : S B M  ******************* */
-                        child: Image.asset
+          
+                        keyboardType: TextInputType.name,                    
+                        controller: nameController,
+          
+                          validator: (value) 
+                          {
+                            if (value?.isEmpty ?? true) 
+                            {
+                              return 'NameEmail is required';
+                            }
+                            
+                            return null;
+                          },
+
+          
+                        decoration: InputDecoration
                         (
-                          'images/logo_sheidt.png',
-                          height: 180,
-                          width: 180,
+                          labelText: 'Name',
+          
+                          enabledBorder: const OutlineInputBorder
+                          (
+                            borderSide: BorderSide(color: Colors.white),
+                          ),
+          
+                          focusedBorder: const OutlineInputBorder
+                          (
+                            borderSide: BorderSide(color: Colors.white),
+                          ),
+          
+                          fillColor: Colors.grey.shade200,
+                          filled: true,
+          
+                          focusedErrorBorder: const OutlineInputBorder
+                          (
+                            borderSide: BorderSide(color: Colors.red),
+                          ),
                         ),
                       ),
                     ),
+                    
+                   
+                    const SizedBox(height: 10),
           
-                    const SizedBox(height: 20),
-          
-                        /* **************** T E X T : Register to Know more ******************* */
-          
-                    Text
-                    (
-                      "Register to know more",
-                      style: TextStyle(color: Colors.white, fontSize: 20),
-                    ),
-          
-                    const SizedBox(height: 20),
-          
-                        /* **************** F I E L D : Email ******************* */
+                /* **************** F I E L D : Email ******************* */
           
                     SizedBox
                     (
                       height: 50,
-                      width: screenWidth-70,
+                      width: screenWidth/1.2,
                       child: TextFormField
                       (
           
@@ -398,12 +446,11 @@ void signUserUp() async
                     
                     const SizedBox(height: 10),
           
-            /* **************** F I E L D : Phone Number ******************* */
-          
+                  /* **************** F I E L D : Phone Number ******************* */
                     SizedBox
                     (
                       height: 50,
-                      width: screenWidth-70,
+                      width: screenWidth/1.2,
                       child: TextFormField
                       (
                         controller: phoneController,
@@ -438,13 +485,87 @@ void signUserUp() async
                     ),
           
                     const SizedBox(height: 10),
+
+                    Container(
+                      
+                      child: Row
+                      (
+                        mainAxisAlignment: MainAxisAlignment.center,
+
+                        children: [
+                      
+                          SizedBox
+                          (
+                            height: 50,
+                            width: screenWidth/2.5,
+                            child: TextFormField
+                            (
+                              controller: lpn1Controller,
+                              
+                              decoration: InputDecoration
+                              (
+                                labelText: 'Licence Plate 1',
+                                enabledBorder: const OutlineInputBorder
+                                (
+                                  borderSide: BorderSide(color: Colors.white),
+                                ),
+                                    
+                                focusedBorder: const OutlineInputBorder
+                                (
+                                  borderSide: BorderSide(color: Colors.white),
+                                ),
+                                    
+                                fillColor: Colors.grey.shade200,
+                                filled: true,
+                                    
+                                hintStyle: TextStyle(color: Colors.grey[500]),
+                              ),
+                            ),
+                          ),
+                      
+                          const SizedBox(width: 10),
+                      
+                          SizedBox
+                          (
+                            height: 50,
+                            width: screenWidth/2.5,
+                            child: TextFormField
+                            (
+                              controller: lpn2Controller,
+                             
+                              decoration: InputDecoration
+                              (
+                                labelText: 'Licence Plate 2',
+                                enabledBorder: const OutlineInputBorder
+                                (
+                                  borderSide: BorderSide(color: Colors.white),
+                                ),
+                                    
+                                focusedBorder: const OutlineInputBorder
+                                (
+                                  borderSide: BorderSide(color: Colors.white),
+                                ),
+                                    
+                                fillColor: Colors.grey.shade200,
+                                filled: true,
+                                    
+                                hintStyle: TextStyle(color: Colors.grey[500]),
+                              ),
+                            ),
+                          ),
+                      
+                      
+                        ],
+                      ),
+                    ),
           
-              /* **************** F I E L D : Password ******************* */
+                    const SizedBox(height: 10),
           
+                 /* **************** F I E L D : Password ******************* */
                     SizedBox
                     (
                       height: 50,
-                      width: screenWidth-70,
+                      width: screenWidth/1.2,
                       child: TextFormField
                       (
                         controller: passwordController,
@@ -498,6 +619,7 @@ void signUserUp() async
                                   : Icons.visibility,
                               color: Colors.black,
                             ),
+
                           ),
                         ),
                       ),
@@ -507,11 +629,10 @@ void signUserUp() async
                     
           
                  /* **************** F I E L D : Confirm Password ******************* */
-          
                     SizedBox
                     (
                       height: 50,
-                      width: screenWidth-70,
+                      width: screenWidth/1.2,
                       child: TextFormField
                       (
                         controller: confpasswordController,
@@ -577,7 +698,11 @@ void signUserUp() async
                       ),
                     ),
           
-                    const SizedBox(height: 30),
+
+  
+                    const SizedBox(height:50),
+
+
                     
           /* **************** R E G I S T E R  B U T T O N ******************* */
           
@@ -640,6 +765,7 @@ void signUserUp() async
                       hb: 50,
                       wb: screenWidth,
                     ),
+                    
                   ],
                 ),
               ),

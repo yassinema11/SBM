@@ -44,7 +44,7 @@ class HomeState extends State<Home>
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text('Permission Denied'),
-            content: Text('Allow access to gallery and photos'),
+            content: Text('Allow access to Settings'),
             actions: <Widget>[
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
@@ -155,6 +155,7 @@ class HomeState extends State<Home>
           {
             beaconBroadcast
                 .setUUID(uuid)
+                .setIdentifier("15")
                 .setMajorId(1)
                 .setMinorId(100)
                 .start();
@@ -279,7 +280,7 @@ class HomeState extends State<Home>
 
     return Container
     (
-      height: screenHeight,
+      height: screenHeight, 
       width: screenWidth,
       
       child: Scaffold
