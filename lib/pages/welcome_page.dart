@@ -714,7 +714,7 @@ class WelcomePageState extends State<WelcomePage>
         break;
 
       case 2:
-        widget = const Settings();
+        widget = const Maps();
         break;
 
       default:

@@ -6,7 +6,7 @@ import 'package:temp1/pages/Home.dart';
 import 'package:temp1/pages/maps.dart';
 import 'package:temp1/pages/profile.dart';
 import 'package:temp1/pages/register_page.dart';
-import 'package:temp1/pages/settings.dart';
+//import 'package:temp1/pages/settings.dart';
 import 'package:temp1/pages/welcome_page.dart';
 
 void main() 
@@ -45,7 +45,7 @@ class MyApp extends StatelessWidget
         '/profile': (context) => const Profile(),
         '/home': (context) => const Home(),
         '/maps': (context) => const Maps(),
-        '/settings': (context) => const Settings(),
+        //'/settings': (context) => const Settings(),
       },
 
     );

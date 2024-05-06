@@ -23,6 +23,8 @@ class ProfileState extends State<Profile>
   late String name = "Name";
   late String mail = "Email";
   late String phone = "Phone";
+  late String lpn1 = "123TN1234";
+  late String lpn2 = "123TN1234";
   late String curpas = "Current Password";
   late String newpas = "New Password";
   late List<dynamic> lpns = []; // List to store license plate numbers
@@ -206,6 +208,8 @@ Future<void> ProfileData() async {
     String newName = name;
     String newMail = mail;
     String newPhone = phone;
+    String newlpn1 = lpn1;
+    String newlpn2 = lpn2;
     String actualPassword = curpas;
     String newPassword = newpas;
 
@@ -306,6 +310,55 @@ Future<void> ProfileData() async {
                   ),
                 ),
 
+const SizedBox(height: 15),
+
+                Container
+                (
+                  height: 60,
+                  decoration: BoxDecoration
+                  (
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.grey[800],
+                  ),
+                  child: TextField
+                  (                    
+                    style: TextStyle(color: Colors.white),
+                    onChanged: (value) => newlpn1 = value,
+                    decoration: InputDecoration
+                    (
+                      labelText: 'Licence Plate Number 1',
+                      labelStyle: TextStyle(color: Colors.white),                    
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                    ),
+                  ),
+                ),
+
+
+const SizedBox(height: 15),
+
+                Container
+                (
+                  height: 60,
+                  decoration: BoxDecoration
+                  (
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.grey[800],
+                  ),
+                  child: TextField
+                  (                    
+                    style: TextStyle(color: Colors.white),
+                    onChanged: (value) => newlpn2 = value,
+                    decoration: InputDecoration
+                    (
+                      labelText: 'Licence Plate Number 2',
+                      labelStyle: TextStyle(color: Colors.white),                    
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                    ),
+                  ),
+                ),
+
       const SizedBox(height: 15),
 
                 Container
@@ -384,8 +437,10 @@ Future<void> ProfileData() async {
                   {
                     'name': newName,
                     'email': newMail,
-                    'phone_number': newPhone,
-                    'password': newPassword,
+                    'phoneNumber': newPhone,
+                    'password': newpas,
+                    'lpn1': newlpn1,
+                    'lpn2': newlpn2,
                   }),
                 );
 
@@ -394,6 +449,8 @@ Future<void> ProfileData() async {
                     name = newName;
                     mail = newMail;
                     phone = newPhone;
+                    lpn1 = newlpn1;
+                    lpn2 = newlpn2;
 
                     print("User data Updated Successfully . . .");
 

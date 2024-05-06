@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously, prefer_const_constructors, unused_element, avoid_print, unused_local_variable, avoid_unnecessary_containers, sized_box_for_whitespace, dead_code
+/* // ignore_for_file: use_build_context_synchronously, prefer_const_constructors, unused_element, avoid_print, unused_local_variable, avoid_unnecessary_containers, sized_box_for_whitespace, dead_code
 
 import 'package:flutter/material.dart';
 import 'package:screen_brightness/screen_brightness.dart';
@@ -259,3 +259,4 @@ class _SettingsState extends State<Settings>
     );
   }
 }
+ */

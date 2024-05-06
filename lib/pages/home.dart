@@ -118,7 +118,7 @@ class HomeState extends State<Home>
       if (uuid == null) return false;
       final pattern = RegExp
       (
-          r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',caseSensitive: false
+          r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
       );  
       return pattern.hasMatch(uuid);
     }
@@ -130,21 +130,25 @@ class HomeState extends State<Home>
 
     print('id: $id');
 
+
+        // exp 00000000-0000-0000-0000-0000.0000.0000
+
     if (id != null) 
     {
       try 
       {
-        int myInt = int.tryParse(id) ?? 0; 
-        String hexString = myInt.toRadixString(16); 
-        String Cid = 'F8';
+        //int myInt = int.tryParse(id) ?? 0; 
+        //String hexString = myInt.toRadixString(16); 
+        
+        //String Cid = 'F8';
 
-        print('Hex String: $hexString');
+        //print('Hex String: $hexString');
 
-        String uuid = 'F838'+'$hexString'+'F-0101-0000-F850-9C398FC199D2';
+        String uuid = 'F838'+'$id'+'0-0101-0000-F850-9C398FC199D2';
 
         //String uuid = 'F83261ef01010000f850';
 
-        String u = 'F83261ef-0101-0000-f850';
+        //String u = 'F83261ef-0101-0000-f850';
         print('Generated UUID: $uuid');
 
         bool isValid = isValidUUID(uuid);
@@ -166,8 +170,10 @@ class HomeState extends State<Home>
             (
               SnackBar
               (
-                content: Text('Opening Barrier . . . '),
+                content: Text(' Openeing Barrier ', style: TextStyle(color: Colors.black),),
                 duration: const Duration(seconds: 3),
+                backgroundColor: Colors.white,
+                behavior: SnackBarBehavior.floating,
               ),
             );    
 
@@ -175,8 +181,10 @@ class HomeState extends State<Home>
             (
               SnackBar
               (
-                content: Text(' Barrier Opened '),
+                content: Text(' Barrier Opened ', style: TextStyle(color: Colors.black),),
                 duration: const Duration(seconds: 2),
+                backgroundColor: Colors.white,
+                behavior: SnackBarBehavior.floating,
               ),
             ); 
 
@@ -317,46 +325,27 @@ class HomeState extends State<Home>
             (
               child: Container
               (
-                width: screenWidth-120,
+                alignment: Alignment.center,
+                width: screenWidth/1.5,
                 height: 60,
                 decoration: BoxDecoration
                 (
                   color: const Color(0xFFA367B1),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: const Row
+                child: Padding
                 (
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: 
-                  [
-                    Padding
+                  padding: EdgeInsets.all(15.0),
+                  child: Text
+                  (
+                    'Main Entry',
+                    style: TextStyle
                     (
-                      padding: EdgeInsets.all(15.0),
-                      child: Text
-                      (
-                        'Free Places',
-                        style: TextStyle
-                        (
-                          color: Colors.white,
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
                     ),
-      
-                    SizedBox(width: 100),
-      
-                    Text
-                    (
-                      '00',
-                      style: TextStyle
-                      (
-                        color: Colors.white,
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),
